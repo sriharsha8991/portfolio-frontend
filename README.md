@@ -1,36 +1,155 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+---
 
-First, run the development server:
+Here’s a **ready-to-use Notion or website portfolio landing page template** designed specifically for you —
+as *Sriharsha Velicheti | AI Engineer • Agentic Systems • RAG Developer* 👇
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# 🧠 **Sriharsha Velicheti — AI Engineer | Agentic & RAG Systems**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 🚀 “Turning Data into Intelligent Action”
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 👋 About Me
 
-To learn more about Next.js, take a look at the following resources:
+Hi, I’m **Sriharsha Velicheti**, an **AI Engineer** passionate about building intelligent systems that combine **retrieval, reasoning, and real-time action**.
+I specialize in **LLM orchestration, multimodal RAG pipelines, and agentic application development**.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+I currently work at **Data Smith AI**, where I develop advanced AI assistants and knowledge-driven applications.
+My focus: building scalable, production-ready AI that makes data *useful*, *actionable*, and *autonomous*.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 💼 What I Do
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### ⚙️ Core Expertise
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* **Retrieval-Augmented Generation (RAG)** — robust, real-time knowledge systems
+* **Agentic AI Applications** — autonomous decision agents for workflows
+* **LLM Pipeline Design** — prompt engineering, model orchestration, API integration
+* **Data Intelligence Systems** — structuring, extraction, and automation from unstructured data
+* **Streamlit + Gemini + FastAPI** Applications
+
+---
+
+## 🧩 Projects & Case Studies
+
+### 🏥 **AI-Powered Healthcare Virtual Assistant**
+
+> Built an end-to-end Gemini-based healthcare assistant capable of symptom checking, appointment booking, lab result interpretation, emergency guidance, and lifestyle coaching.
+
+**Tech Stack:** Gemini API, Streamlit, LangChain, FastAPI, MongoDB
+**Highlights:**
+
+* Multimodal RAG for patient reports & health record insights
+* Secure doctor-patient interaction layer
+* Real-time context reasoning for health advice
+
+---
+
+### 🧮 **Mongo Query Engine**
+
+> Natural language → executable MongoDB queries with validation.
+
+**Tech Stack:** Python, LangChain, OpenAI, MongoDB
+**Highlights:**
+
+* Converts user text into accurate, executable database queries
+* Integrated context retrieval for schema understanding
+* Supports real-time analytics dashboard embedding
+
+---
+
+### 📄 **PDF Data Extraction & Sheet Processing System**
+
+> Automated document parser for PDFs into structured data sheets.
+
+**Tech Stack:** Python, Tesseract, LangChain
+**Highlights:**
+
+* Extracts tabular + textual data
+* Intelligent schema detection
+* Used in document-heavy enterprise environments
+
+---
+
+### 🎯 **Resume Filtering System**
+
+> AI-driven resume shortlisting pipeline using custom embeddings.
+
+**Tech Stack:** OpenAI API, Pinecone, Streamlit
+**Highlights:**
+
+* Converts HR queries → semantic search
+* Reduces manual filtering time by 85%
+* Scalable integration with recruitment CRMs
+
+---
+
+## 🧠 Featured Skills
+
+| Category           | Tools & Tech                                              |
+| ------------------ | --------------------------------------------------------- |
+| **Languages**      | Python, SQL                                               |
+| **Frameworks**     | LangChain, Streamlit, FastAPI                             |
+| **AI/ML APIs**     | OpenAI, Gemini, Hugging Face                              |
+| **Databases**      | MongoDB, PostgreSQL                                       |
+| **DevOps & Tools** | Docker, Git, Celery, Redis                                |
+| **Other**          | Prompt Engineering, MLOps fundamentals, API Orchestration |
+
+---
+
+## 🏆 Achievements & Recognition
+
+* 🥇 Golden Badges in **Python** and **MySQL** – HackerRank
+* 🧩 200+ problems solved on **LeetCode**
+* 🥉 3 **Kaggle Bronze Medals (Discussions)**
+* 🏅 6th place – **MachineHack Hackathon**
+* 🎓 **NPTEL Python for Data Science** – IIT Madras
+
+---
+
+## 💡 Services
+
+I help startups, researchers, and developers **bring AI to production**.
+Let’s collaborate if you need:
+
+* 💬 Custom AI assistant for your business
+* 🧱 RAG pipeline or agent system for document intelligence
+* 🧮 LLM integration into your product (Streamlit / FastAPI)
+* 🔍 Automated data extraction & processing workflows
+
+---
+
+## 📬 Let’s Connect
+
+💌 **Email:** [srih8991@gmail.com](mailto:srih8991@gmail.com)
+📱 **Phone:** +91 8309012139
+🔗 **LinkedIn:** [linkedin.com/in/sriharshavelicheti](https://www.linkedin.com/in/sriharshavelicheti)
+💻 **GitHub:** [github.com/SriharshaVelicheti](https://github.com/SriharshaVelicheti)
+
+---
+
+## ⚡ Work With Me
+
+👉 [**Book a Discovery Call**](#) — discuss your AI use case
+👉 [**Hire me for a freelance project**](#) — LLM | RAG | Automation
+👉 [**View all my open-source work**](#)
+
+---
+
+## 📊 Live Stats *(optional if you embed from GitHub/YouTube)*
+
+* ⭐ 10+ AI projects built
+* 🎥 100+ YouTube followers (growing weekly)
+* 🧑‍💻 Freelance clients: early-stage AI startups & research teams
+
+---
+
+### 🧠 Quote That Defines Me
+
+> “I’m obsessed with building systems that think — and scale themselves.”
+
+
