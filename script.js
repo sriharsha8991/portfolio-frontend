@@ -142,7 +142,7 @@ document.addEventListener('keydown', (e) => {
 
 // ==================== Chat Functionality ====================
 // Chat Configuration
-const CHAT_API_URL = 'http://localhost:8000';  // Update with your backend URL
+const CHAT_API_URL = 'https://portfolio-frontend-otua.onrender.com/';  // Update with your backend URL
 let chatHistory = [];
 let chatWebSocket = null;
 let isConnected = false;
