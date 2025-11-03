@@ -1,155 +1,176 @@
+# Portfolio Website - Sriharsha Velicheti
+
+A minimalistic, professional portfolio website showcasing expertise in Generative AI Engineering, RAG applications, and LLM orchestration.
+
+## ✨ Features
+
+- **Single-Page Scrolling**: Smooth navigation through all sections
+- **Dark/Light Theme**: Toggle between monochrome light and dark black themes
+- **Responsive Design**: Fully optimized for mobile, tablet, and desktop
+- **Smooth Animations**: Scroll-based reveals and interactions
+- **Interactive Timeline**: Clickable experience items with detailed information
+- **Project Modals**: Expandable project cards with comprehensive details
+- **Interactive Skills Visualization**: Toggle between progress bars and radar chart
+- **GitHub Integration**: Live stats, contribution graph, and top repositories
+- **Contact Form**: EmailJS integration for direct messaging
+- **Resume Download**: One-click PDF download
+- **Chat Integration**: Floating button placeholder for future FastAPI integration
+- **Fast Loading**: Optimized with Tailwind CSS CDN and Chart.js
+- **Clean Code**: Well-structured HTML, CSS, and JavaScript
+
+## 🎨 Design
+
+- **Typography**: Inter (body) and Poppins (headings)
+- **Color Scheme**: 
+  - Light Theme: Clean monochrome with blue accents
+  - Dark Theme: Deep black (#0a0a0a) with subtle grays
+- **Layout**: Grid-based responsive design
+- **Animations**: Fade-in, slide-in, and hover effects
+
+## 🚀 Quick Start
+
+1. **Clone or Download** this repository
+2. **Setup EmailJS** (optional - for contact form):
+   - Follow instructions in `EMAILJS_SETUP.md`
+   - Or use direct email links (already functional)
+3. **Add Your Photo** (optional):
+   - Replace the placeholder in hero section with your image
+   - Path: Update `src` in line ~165 of `index.html`
+4. **Open `index.html`** in your browser
+5. That's it! No build process required.
+
+## 📁 File Structure
+
+```
+Portfolio/
+├── index.html          # Main HTML file with all content
+├── script.js           # JavaScript for interactivity
+└── README.md           # This file
+```
+
+## 🔧 Future Enhancements
+
+### Chat Integration (FastAPI Backend)
+
+The floating chat button is ready for integration. To connect with FastAPI:
+
+1. **Create FastAPI backend**:
+```python
+from fastapi import FastAPI, WebSocket
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.websocket("/ws/chat")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        # Process with LLM/RAG
+        response = process_message(data)
+        await websocket.send_text(response)
+```
+
+2. **Update JavaScript** in `script.js`:
+```javascript
+const ws = new WebSocket('ws://localhost:8000/ws/chat');
+
+ws.onmessage = (event) => {
+    displayMessage(event.data);
+};
+
+function sendMessage(message) {
+    ws.send(message);
+}
+```
+
+### Adding Your Photo
+
+Replace the placeholder in the hero section:
+
+```html
+<!-- Find this section in index.html (around line 165) -->
+<div class="w-full h-full rounded-full bg-white dark:bg-dark-surface flex items-center justify-center overflow-hidden">
+    <!-- Replace the placeholder div with your image -->
+    <img src="path/to/your/photo.jpg" alt="Sriharsha Velicheti" class="w-full h-full object-cover">
+</div>
+```
+
+## 🎯 Sections
+
+1. **Hero**: Introduction with photo, name, and key links + Resume download
+2. **About**: Professional summary and stats
+3. **Experience**: Interactive timeline with work history
+4. **Projects**: Grid layout with expandable modals
+5. **Skills**: Interactive visualizations (progress bars & radar chart)
+6. **GitHub**: Live activity, stats, and top repositories
+7. **Education**: Degree details and accomplishments
+8. **Contact**: Contact form with EmailJS + direct contact methods
+
+## 🌐 Browser Support
+
+- Chrome (recommended)
+- Firefox
+- Safari
+- Edge
+- Mobile browsers
+
+## 📱 Responsive Breakpoints
+
+- Mobile: < 768px
+- Tablet: 768px - 1024px
+- Desktop: > 1024px
+
+## ⚡ Performance
+
+- **Fast Loading**: CDN-based assets
+- **Optimized Animations**: GPU-accelerated transforms
+- **Lazy Loading**: Ready for image optimization
+- **Debounced Scroll**: Efficient event handling
+
+## 🎨 Customization
+
+### Colors
+Edit the Tailwind config in `index.html` (around line 19):
+```javascript
+colors: {
+    'light-bg': '#FFFFFF',
+    'dark-bg': '#0a0a0a',
+    // ... customize colors
+}
+```
+
+### Content
+All content is directly in `index.html` for easy editing.
+
+### Animations
+Modify animation timings in `<style>` section or `script.js`.
+
+## 📧 Contact
+
+- **Email**: srih8991@gmail.com
+- **Phone**: +91 8309012139
+- **GitHub**: [@sriharsha8991](https://github.com/sriharsha8991)
+- **LinkedIn**: [Sriharsha Velicheti](https://www.linkedin.com/in/sriharsha-velicheti)
+
+## 📄 License
+
+Personal portfolio - All rights reserved.
+
+## 🙏 Acknowledgments
+
+- Built with Tailwind CSS
+- Icons by Font Awesome
+- Fonts from Google Fonts
 
 ---
 
-Here’s a **ready-to-use Notion or website portfolio landing page template** designed specifically for you —
-as *Sriharsha Velicheti | AI Engineer • Agentic Systems • RAG Developer* 👇
-
----
-
-# 🧠 **Sriharsha Velicheti — AI Engineer | Agentic & RAG Systems**
-
-### 🚀 “Turning Data into Intelligent Action”
-
----
-
-## 👋 About Me
-
-Hi, I’m **Sriharsha Velicheti**, an **AI Engineer** passionate about building intelligent systems that combine **retrieval, reasoning, and real-time action**.
-I specialize in **LLM orchestration, multimodal RAG pipelines, and agentic application development**.
-
-I currently work at **Data Smith AI**, where I develop advanced AI assistants and knowledge-driven applications.
-My focus: building scalable, production-ready AI that makes data *useful*, *actionable*, and *autonomous*.
-
----
-
-## 💼 What I Do
-
-### ⚙️ Core Expertise
-
-* **Retrieval-Augmented Generation (RAG)** — robust, real-time knowledge systems
-* **Agentic AI Applications** — autonomous decision agents for workflows
-* **LLM Pipeline Design** — prompt engineering, model orchestration, API integration
-* **Data Intelligence Systems** — structuring, extraction, and automation from unstructured data
-* **Streamlit + Gemini + FastAPI** Applications
-
----
-
-## 🧩 Projects & Case Studies
-
-### 🏥 **AI-Powered Healthcare Virtual Assistant**
-
-> Built an end-to-end Gemini-based healthcare assistant capable of symptom checking, appointment booking, lab result interpretation, emergency guidance, and lifestyle coaching.
-
-**Tech Stack:** Gemini API, Streamlit, LangChain, FastAPI, MongoDB
-**Highlights:**
-
-* Multimodal RAG for patient reports & health record insights
-* Secure doctor-patient interaction layer
-* Real-time context reasoning for health advice
-
----
-
-### 🧮 **Mongo Query Engine**
-
-> Natural language → executable MongoDB queries with validation.
-
-**Tech Stack:** Python, LangChain, OpenAI, MongoDB
-**Highlights:**
-
-* Converts user text into accurate, executable database queries
-* Integrated context retrieval for schema understanding
-* Supports real-time analytics dashboard embedding
-
----
-
-### 📄 **PDF Data Extraction & Sheet Processing System**
-
-> Automated document parser for PDFs into structured data sheets.
-
-**Tech Stack:** Python, Tesseract, LangChain
-**Highlights:**
-
-* Extracts tabular + textual data
-* Intelligent schema detection
-* Used in document-heavy enterprise environments
-
----
-
-### 🎯 **Resume Filtering System**
-
-> AI-driven resume shortlisting pipeline using custom embeddings.
-
-**Tech Stack:** OpenAI API, Pinecone, Streamlit
-**Highlights:**
-
-* Converts HR queries → semantic search
-* Reduces manual filtering time by 85%
-* Scalable integration with recruitment CRMs
-
----
-
-## 🧠 Featured Skills
-
-| Category           | Tools & Tech                                              |
-| ------------------ | --------------------------------------------------------- |
-| **Languages**      | Python, SQL                                               |
-| **Frameworks**     | LangChain, Streamlit, FastAPI                             |
-| **AI/ML APIs**     | OpenAI, Gemini, Hugging Face                              |
-| **Databases**      | MongoDB, PostgreSQL                                       |
-| **DevOps & Tools** | Docker, Git, Celery, Redis                                |
-| **Other**          | Prompt Engineering, MLOps fundamentals, API Orchestration |
-
----
-
-## 🏆 Achievements & Recognition
-
-* 🥇 Golden Badges in **Python** and **MySQL** – HackerRank
-* 🧩 200+ problems solved on **LeetCode**
-* 🥉 3 **Kaggle Bronze Medals (Discussions)**
-* 🏅 6th place – **MachineHack Hackathon**
-* 🎓 **NPTEL Python for Data Science** – IIT Madras
-
----
-
-## 💡 Services
-
-I help startups, researchers, and developers **bring AI to production**.
-Let’s collaborate if you need:
-
-* 💬 Custom AI assistant for your business
-* 🧱 RAG pipeline or agent system for document intelligence
-* 🧮 LLM integration into your product (Streamlit / FastAPI)
-* 🔍 Automated data extraction & processing workflows
-
----
-
-## 📬 Let’s Connect
-
-💌 **Email:** [srih8991@gmail.com](mailto:srih8991@gmail.com)
-📱 **Phone:** +91 8309012139
-🔗 **LinkedIn:** [linkedin.com/in/sriharshavelicheti](https://www.linkedin.com/in/sriharshavelicheti)
-💻 **GitHub:** [github.com/SriharshaVelicheti](https://github.com/SriharshaVelicheti)
-
----
-
-## ⚡ Work With Me
-
-👉 [**Book a Discovery Call**](#) — discuss your AI use case
-👉 [**Hire me for a freelance project**](#) — LLM | RAG | Automation
-👉 [**View all my open-source work**](#)
-
----
-
-## 📊 Live Stats *(optional if you embed from GitHub/YouTube)*
-
-* ⭐ 10+ AI projects built
-* 🎥 100+ YouTube followers (growing weekly)
-* 🧑‍💻 Freelance clients: early-stage AI startups & research teams
-
----
-
-### 🧠 Quote That Defines Me
-
-> “I’m obsessed with building systems that think — and scale themselves.”
-
-
+**Built with passion and precision** 🚀
