@@ -1,0 +1,13 @@
+# FastAPI and Web Server
+fastapi
+uvicorn[standard]
+
+# Google GenAI SDK (New Standard - GA release as per migration guide)
+# Replaces google-generativeai with improved developer experience
+google-genai
+
+# Core dependencies
+python-multipart
+pydantic
+python-dotenv
+websockets

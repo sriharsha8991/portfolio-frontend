@@ -140,11 +140,256 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// ==================== Chat Functionality ====================
+// Chat Configuration
+const CHAT_API_URL = 'http://localhost:8000';  // Update with your backend URL
+let chatHistory = [];
+let chatWebSocket = null;
+let isConnected = false;
+
 // Chat Toggle
 function toggleChat() {
     const chatPanel = document.getElementById('chat-panel');
-    chatPanel.classList.toggle('active');
+    const isActive = chatPanel.classList.toggle('active');
+    
+    if (isActive && !isConnected) {
+        initializeChat();
+    }
 }
+
+// Initialize Chat Connection
+function initializeChat() {
+    const chatMessages = document.getElementById('chat-messages');
+    
+    // Add loading message
+    chatMessages.innerHTML = `
+        <div class="text-center py-4">
+            <i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i>
+            <p class="text-sm text-gray-500 mt-2">Connecting to AI assistant...</p>
+        </div>
+    `;
+    
+    // Try WebSocket first, fallback to HTTP
+    try {
+        connectWebSocket();
+    } catch (error) {
+        console.log('WebSocket not available, using HTTP');
+        initializeHTTPChat();
+    }
+}
+
+// WebSocket Connection
+function connectWebSocket() {
+    const wsUrl = CHAT_API_URL.replace('http', 'ws') + '/ws/chat';
+    chatWebSocket = new WebSocket(wsUrl);
+    
+    chatWebSocket.onopen = () => {
+        console.log('WebSocket connected');
+        isConnected = true;
+    };
+    
+    chatWebSocket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'welcome') {
+            displayWelcomeMessage(data.message);
+        } else if (data.type === 'message') {
+            displayAssistantMessage(data.response);
+        } else if (data.type === 'error') {
+            displayErrorMessage(data.message);
+        }
+    };
+    
+    chatWebSocket.onerror = (error) => {
+        console.log('WebSocket error, falling back to HTTP');
+        initializeHTTPChat();
+    };
+    
+    chatWebSocket.onclose = () => {
+        isConnected = false;
+        console.log('WebSocket disconnected');
+    };
+}
+
+// HTTP Chat Fallback
+function initializeHTTPChat() {
+    isConnected = true;
+    displayWelcomeMessage("Hi! I'm Sriharsha's AI assistant. Ask me anything about his professional experience, skills, projects, or education!");
+}
+
+// Display Welcome Message
+function displayWelcomeMessage(message) {
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.innerHTML = `
+        <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
+            <div class="flex items-start space-x-2">
+                <i class="fas fa-robot text-blue-500 mt-1"></i>
+                <p class="text-sm">${message}</p>
+            </div>
+        </div>
+    `;
+    
+    // Enable input
+    document.getElementById('chat-input').disabled = false;
+    document.getElementById('chat-send-btn').disabled = false;
+}
+
+// Display User Message
+function displayUserMessage(message) {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-4 ml-8';
+    messageDiv.innerHTML = `
+        <div class="flex items-start space-x-2 justify-end">
+            <p class="text-sm text-right">${escapeHtml(message)}</p>
+            <i class="fas fa-user text-blue-500 mt-1"></i>
+        </div>
+    `;
+    chatMessages.appendChild(messageDiv);
+    scrollChatToBottom();
+}
+
+// Display Assistant Message
+function displayAssistantMessage(message) {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4 mr-8';
+    messageDiv.innerHTML = `
+        <div class="flex items-start space-x-2">
+            <i class="fas fa-robot text-blue-500 mt-1"></i>
+            <p class="text-sm">${escapeHtml(message)}</p>
+        </div>
+    `;
+    chatMessages.appendChild(messageDiv);
+    scrollChatToBottom();
+}
+
+// Display Loading Message
+function displayLoadingMessage() {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.id = 'loading-message';
+    messageDiv.className = 'bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4';
+    messageDiv.innerHTML = `
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-spinner fa-spin text-blue-500"></i>
+            <p class="text-sm text-gray-500">Thinking...</p>
+        </div>
+    `;
+    chatMessages.appendChild(messageDiv);
+    scrollChatToBottom();
+}
+
+// Remove Loading Message
+function removeLoadingMessage() {
+    const loadingMsg = document.getElementById('loading-message');
+    if (loadingMsg) {
+        loadingMsg.remove();
+    }
+}
+
+// Display Error Message
+function displayErrorMessage(message) {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'bg-red-50 dark:bg-red-900/20 rounded-lg p-4 mb-4';
+    messageDiv.innerHTML = `
+        <div class="flex items-start space-x-2">
+            <i class="fas fa-exclamation-circle text-red-500 mt-1"></i>
+            <p class="text-sm text-red-600 dark:text-red-400">${escapeHtml(message)}</p>
+        </div>
+    `;
+    chatMessages.appendChild(messageDiv);
+    scrollChatToBottom();
+}
+
+// Send Chat Message
+async function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    // Display user message
+    displayUserMessage(message);
+    input.value = '';
+    
+    // Disable input while processing
+    input.disabled = true;
+    document.getElementById('chat-send-btn').disabled = true;
+    
+    // Show loading
+    displayLoadingMessage();
+    
+    try {
+        if (chatWebSocket && chatWebSocket.readyState === WebSocket.OPEN) {
+            // Send via WebSocket
+            chatWebSocket.send(JSON.stringify({ message: message }));
+            removeLoadingMessage();
+        } else {
+            // Send via HTTP
+            const response = await fetch(`${CHAT_API_URL}/api/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    conversation_history: chatHistory
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to get response');
+            }
+            
+            const data = await response.json();
+            removeLoadingMessage();
+            displayAssistantMessage(data.response);
+            
+            // Update history
+            chatHistory.push({
+                user: message,
+                assistant: data.response
+            });
+        }
+    } catch (error) {
+        removeLoadingMessage();
+        displayErrorMessage('Failed to connect to the chat service. Please make sure the backend is running.');
+        console.error('Chat error:', error);
+    } finally {
+        // Re-enable input
+        input.disabled = false;
+        document.getElementById('chat-send-btn').disabled = false;
+        input.focus();
+    }
+}
+
+// Scroll chat to bottom
+function scrollChatToBottom() {
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Handle Enter key in chat input
+document.addEventListener('DOMContentLoaded', () => {
+    const chatInput = document.getElementById('chat-input');
+    if (chatInput) {
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+    }
+});
 
 // Typing Effect for Hero Section (Optional Enhancement)
 const heroTitle = document.querySelector('#home h1');
