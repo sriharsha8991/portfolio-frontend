@@ -1,0 +1,59 @@
+name: Deploy Portfolio
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Frontend deployment to GitHub Pages
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: '.'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+  # Backend tests
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+      
+      - name: Run linting
+        run: |
+          cd backend
+          pip install flake8
+          flake8 main.py --max-line-length=120 --ignore=E501,W503
+      
+      - name: Check imports
+        run: |
+          cd backend
+          python -c "from google import genai; from google.genai import types"
+
+  # Optional: Deploy backend to Render
+  # This requires setting up Render's GitHub integration
+  # Or you can use Render's auto-deploy from GitHub
