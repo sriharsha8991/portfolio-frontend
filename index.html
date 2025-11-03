@@ -981,35 +981,39 @@
     <div id="chat-panel" class="chat-panel bg-white dark:bg-dark-bg border border-gray-200 dark:border-gray-700">
         <div class="p-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-t-2xl">
             <div class="flex justify-between items-center">
-                <h3 class="font-bold">AI Assistant</h3>
+                <div>
+                    <h3 class="font-bold">AI Assistant</h3>
+                    <p class="text-xs opacity-90">Powered by Gemini AI</p>
+                </div>
                 <button onclick="toggleChat()" class="hover:bg-white/20 rounded p-1">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <p class="text-sm opacity-90">Powered by FastAPI</p>
         </div>
         
-        <div class="flex-1 p-4 overflow-y-auto">
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto">
             <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
-                <p class="text-sm">👋 Hello! I'm currently being integrated with a FastAPI backend for intelligent conversations about this portfolio.</p>
-            </div>
-            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                <p class="text-sm text-blue-800 dark:text-blue-300">
-                    <i class="fas fa-info-circle mr-2"></i>
-                    Coming soon: Real-time chat powered by AI to answer questions about my experience, projects, and skills!
-                </p>
+                <p class="text-sm">👋 Click "Connect" to start chatting with the AI assistant about Sriharsha's portfolio!</p>
             </div>
         </div>
         
         <div class="p-4 border-t border-gray-200 dark:border-gray-700">
             <div class="flex space-x-2">
-                <input type="text" placeholder="Type your message..." disabled 
-                    class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 opacity-50">
-                <button disabled class="px-4 py-2 bg-blue-500 text-white rounded-lg opacity-50">
+                <input 
+                    id="chat-input" 
+                    type="text" 
+                    placeholder="Ask about experience, skills, projects..." 
+                    disabled 
+                    class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                <button 
+                    id="chat-send-btn" 
+                    onclick="sendChatMessage()" 
+                    disabled 
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
-            <p class="text-xs text-gray-500 mt-2 text-center">Integration in progress...</p>
+            <p class="text-xs text-gray-500 mt-2 text-center">Intelligent AI powered by Gemini</p>
         </div>
     </div>
     
