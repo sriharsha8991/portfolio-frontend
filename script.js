@@ -141,8 +141,19 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ==================== Chat Functionality ====================
-// Chat Configuration
-const CHAT_API_URL = 'https://portfolio-frontend-otua.onrender.com/';  // Update with your backend URL
+// Chat Configuration - Using centralized config
+const chatConfig = window.PORTFOLIO_CONFIG ? window.PORTFOLIO_CONFIG.getConfig() : {
+    apiUrl: 'http://127.0.0.1:8000',
+    wsUrl: 'ws://127.0.0.1:8000',
+    environment: 'development'
+};
+
+const CHAT_API_URL = chatConfig.apiUrl;
+const CHAT_WS_URL = chatConfig.wsUrl;
+
+console.log(`🚀 Chat running in ${chatConfig.environment} mode`);
+console.log(`📡 API URL: ${CHAT_API_URL}`);
+
 let chatHistory = [];
 let chatWebSocket = null;
 let isConnected = false;
@@ -180,7 +191,7 @@ function initializeChat() {
 
 // WebSocket Connection
 function connectWebSocket() {
-    const wsUrl = CHAT_API_URL.replace('http', 'ws') + '/ws/chat';
+    const wsUrl = CHAT_WS_URL + '/ws/chat';
     chatWebSocket = new WebSocket(wsUrl);
     
     chatWebSocket.onopen = () => {
