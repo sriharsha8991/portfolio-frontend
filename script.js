@@ -50,6 +50,327 @@ window.addEventListener('scroll', () => {
     document.getElementById('progress-bar').style.width = scrolled + '%';
 });
 
+// ==================== HERO SECTION ENHANCEMENTS ====================
+
+// 1. TYPEWRITER EFFECT
+const roles = [
+    'Gen AI Engineer',
+    'RAG Specialist',
+    'LLM Orchestration Expert',
+    'AI Solutions Architect'
+];
+
+let roleIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+let typewriterDelay = 200;
+
+function typeWriter() {
+    const typewriterElement = document.getElementById('typewriter-text');
+    const currentRole = roles[roleIndex];
+    
+    if (!isDeleting) {
+        typewriterElement.textContent = currentRole.substring(0, charIndex);
+        charIndex++;
+        
+        if (charIndex > currentRole.length) {
+            isDeleting = true;
+            typewriterDelay = 2000; // Pause at end
+        } else {
+            typewriterDelay = 100;
+        }
+    } else {
+        typewriterElement.textContent = currentRole.substring(0, charIndex);
+        charIndex--;
+        
+        if (charIndex === 0) {
+            isDeleting = false;
+            roleIndex = (roleIndex + 1) % roles.length;
+            typewriterDelay = 500;
+        } else {
+            typewriterDelay = 50;
+        }
+    }
+    
+    setTimeout(typeWriter, typewriterDelay);
+}
+
+// Start typewriter effect when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(typeWriter, 1000);
+});
+
+// 2. PARTICLE BACKGROUND
+class ParticleSystem {
+    constructor() {
+        this.canvas = document.getElementById('particle-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.particleCount = 80;
+        this.mouse = { x: 0, y: 0 };
+        
+        this.init();
+        this.animate();
+        
+        window.addEventListener('resize', () => this.resize());
+        this.canvas.addEventListener('mousemove', (e) => this.updateMouse(e));
+    }
+    
+    init() {
+        this.resize();
+        this.particles = [];
+        
+        for (let i = 0; i < this.particleCount; i++) {
+            this.particles.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 2 + 1
+            });
+        }
+    }
+    
+    resize() {
+        this.canvas.width = this.canvas.offsetWidth;
+        this.canvas.height = this.canvas.offsetHeight;
+    }
+    
+    updateMouse(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        this.mouse.x = e.clientX - rect.left;
+        this.mouse.y = e.clientY - rect.top;
+    }
+    
+    animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Update and draw particles
+        this.particles.forEach((particle, i) => {
+            // Move particle
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            
+            // Bounce off edges
+            if (particle.x < 0 || particle.x > this.canvas.width) particle.vx *= -1;
+            if (particle.y < 0 || particle.y > this.canvas.height) particle.vy *= -1;
+            
+            // Draw particle
+            const isDark = html.classList.contains('dark');
+            this.ctx.fillStyle = isDark ? 'rgba(59, 130, 246, 0.5)' : 'rgba(59, 130, 246, 0.3)';
+            this.ctx.beginPath();
+            this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // Draw connections
+            this.particles.slice(i + 1).forEach(particle2 => {
+                const dx = particle.x - particle2.x;
+                const dy = particle.y - particle2.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 120) {
+                    const opacity = (1 - distance / 120) * 0.3;
+                    this.ctx.strokeStyle = isDark 
+                        ? `rgba(139, 92, 246, ${opacity})` 
+                        : `rgba(59, 130, 246, ${opacity})`;
+                    this.ctx.lineWidth = 1;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(particle.x, particle.y);
+                    this.ctx.lineTo(particle2.x, particle2.y);
+                    this.ctx.stroke();
+                }
+            });
+            
+            // Mouse interaction
+            const dx = particle.x - this.mouse.x;
+            const dy = particle.y - this.mouse.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < 100) {
+                const force = (100 - distance) / 100;
+                particle.x += (dx / distance) * force * 2;
+                particle.y += (dy / distance) * force * 2;
+            }
+        });
+        
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// Initialize particle system
+new ParticleSystem();
+
+// 3. ENHANCED PROFILE IMAGE WITH CURSOR MOVEMENT
+const profileContainer = document.getElementById('profile-container');
+
+if (profileContainer) {
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    
+    document.addEventListener('mousemove', (e) => {
+        const rect = profileContainer.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        // Calculate distance from center
+        const deltaX = e.clientX - centerX;
+        const deltaY = e.clientY - centerY;
+        
+        // Limit movement to 15px
+        const maxMove = 15;
+        targetX = Math.max(-maxMove, Math.min(maxMove, deltaX / 20));
+        targetY = Math.max(-maxMove, Math.min(maxMove, deltaY / 20));
+    });
+    
+    // Smooth animation
+    function animateProfile() {
+        currentX += (targetX - currentX) * 0.1;
+        currentY += (targetY - currentY) * 0.1;
+        
+        profileContainer.style.transform = `translate(${currentX}px, ${currentY}px)`;
+        requestAnimationFrame(animateProfile);
+    }
+    
+    animateProfile();
+}
+
+// 4. ORBITING SKILLS WITH CURSOR ROTATION CONTROL
+class OrbitingSkills {
+    constructor() {
+        this.container = document.getElementById('skill-orbit');
+        this.pills = Array.from(document.querySelectorAll('.skill-pill'));
+        this.radius = 220;
+        this.rotation = 0;
+        this.targetRotation = 0;
+        this.isDragging = false;
+        this.lastAngle = 0;
+        this.autoRotate = true;
+        this.autoRotateSpeed = 0.3;
+        
+        if (this.container && this.pills.length > 0) {
+            this.init();
+            this.animate();
+        }
+    }
+    
+    init() {
+        // Position pills initially
+        this.pills.forEach((pill, index) => {
+            pill.dataset.initialAngle = (360 / this.pills.length) * index;
+        });
+        
+        // Add event listeners
+        this.pills.forEach(pill => {
+            pill.addEventListener('mousedown', (e) => this.startDrag(e));
+            pill.addEventListener('touchstart', (e) => this.startDrag(e));
+        });
+        
+        document.addEventListener('mousemove', (e) => this.onDrag(e));
+        document.addEventListener('touchmove', (e) => this.onDrag(e));
+        document.addEventListener('mouseup', () => this.endDrag());
+        document.addEventListener('touchend', () => this.endDrag());
+        
+        // Stop auto-rotate on hover
+        this.container.addEventListener('mouseenter', () => {
+            this.autoRotate = false;
+        });
+        
+        this.container.addEventListener('mouseleave', () => {
+            this.autoRotate = true;
+        });
+    }
+    
+    startDrag(e) {
+        this.isDragging = true;
+        this.autoRotate = false;
+        
+        const rect = this.container.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        
+        this.lastAngle = Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+    }
+    
+    onDrag(e) {
+        if (!this.isDragging) return;
+        
+        const rect = this.container.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        
+        const currentAngle = Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+        const deltaAngle = currentAngle - this.lastAngle;
+        
+        this.targetRotation += deltaAngle;
+        this.lastAngle = currentAngle;
+    }
+    
+    endDrag() {
+        this.isDragging = false;
+        setTimeout(() => {
+            if (!this.isDragging) {
+                this.autoRotate = true;
+            }
+        }, 2000);
+    }
+    
+    animate() {
+        // Auto-rotate when not dragging
+        if (this.autoRotate && !this.isDragging) {
+            this.targetRotation += this.autoRotateSpeed;
+        }
+        
+        // Smooth rotation
+        this.rotation += (this.targetRotation - this.rotation) * 0.1;
+        
+        // Update pill positions
+        this.pills.forEach((pill, index) => {
+            const initialAngle = parseFloat(pill.dataset.initialAngle);
+            const angle = (initialAngle + this.rotation) * (Math.PI / 180);
+            
+            const x = Math.cos(angle) * this.radius;
+            const y = Math.sin(angle) * this.radius;
+            
+            pill.style.left = `calc(50% + ${x}px)`;
+            pill.style.top = `calc(50% + ${y}px)`;
+            pill.style.transform = `translate(-50%, -50%)`;
+        });
+        
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// Initialize orbiting skills
+new OrbitingSkills();
+
+// 5. MAGNETIC BUTTONS
+const magneticButtons = document.querySelectorAll('.magnetic-btn');
+
+magneticButtons.forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        
+        btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+    });
+    
+    btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'translate(0, 0)';
+    });
+});
+
+// ==================== END HERO SECTION ENHANCEMENTS ====================
+
+
 // Active Navigation Link
 const sections = document.querySelectorAll('section');
 const navLinks = document.querySelectorAll('.nav-link');
@@ -139,6 +460,160 @@ document.addEventListener('keydown', (e) => {
         document.body.style.overflow = 'auto';
     }
 });
+
+// ==================== SECTION ENHANCEMENTS ====================
+
+// Scroll Reveal Animation
+const revealElements = document.querySelectorAll('.reveal');
+
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+        }
+    });
+}, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+});
+
+revealElements.forEach(element => {
+    revealObserver.observe(element);
+});
+
+// Animated Stat Cards Counter
+function animateCounter(element) {
+    const target = parseInt(element.textContent);
+    const duration = 2000;
+    const step = target / (duration / 16);
+    let current = 0;
+    
+    const timer = setInterval(() => {
+        current += step;
+        if (current >= target) {
+            element.textContent = element.parentElement.textContent.includes('+') ? target + '+' : target;
+            clearInterval(timer);
+        } else {
+            element.textContent = Math.floor(current) + (element.parentElement.textContent.includes('+') ? '+' : '');
+        }
+    }, 16);
+}
+
+// Trigger counter animation on scroll
+const statCards = document.querySelectorAll('.stat-card');
+const statObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.dataset.animated) {
+            const numberElement = entry.target.querySelector('.stat-number');
+            if (numberElement) {
+                animateCounter(numberElement);
+                entry.target.dataset.animated = 'true';
+            }
+        }
+    });
+}, { threshold: 0.5 });
+
+statCards.forEach(card => {
+    statObserver.observe(card);
+});
+
+// Skills Progress Bar Animation
+const skillProgressBars = document.querySelectorAll('.skill-progress-bar');
+const skillObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.dataset.animated) {
+            const progress = entry.target.dataset.progress;
+            setTimeout(() => {
+                entry.target.style.width = progress + '%';
+                entry.target.dataset.animated = 'true';
+            }, 200);
+        }
+    });
+}, { threshold: 0.5 });
+
+skillProgressBars.forEach(bar => {
+    bar.style.width = '0%';
+    skillObserver.observe(bar);
+});
+
+// GitHub Stats Animation
+const githubStatCards = document.querySelectorAll('.github-stat-card');
+githubStatCards.forEach((card, index) => {
+    setTimeout(() => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.transition = 'all 0.6s ease';
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.3 });
+        
+        observer.observe(card);
+    }, index * 100);
+});
+
+// Interactive Contact Form Enhancement
+const contactFormInputs = document.querySelectorAll('.contact-input');
+contactFormInputs.forEach(input => {
+    input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'translateY(-2px)';
+    });
+    
+    input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'translateY(0)';
+    });
+});
+
+// Smooth Experience Card Expansion
+window.toggleTimeline = function(id) {
+    const element = document.getElementById(id);
+    const card = element.closest('.experience-card');
+    
+    if (element.style.maxHeight) {
+        element.style.maxHeight = null;
+        card.style.background = '';
+    } else {
+        element.style.maxHeight = element.scrollHeight + "px";
+    }
+};
+
+// Initialize all experience cards as collapsed
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[id^="exp"]').forEach(exp => {
+        exp.style.maxHeight = exp.scrollHeight + "px";
+        exp.style.transition = 'max-height 0.4s ease-out';
+    });
+});
+
+// Add parallax effect to sections on scroll
+let ticking = false;
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        window.requestAnimationFrame(() => {
+            const scrolled = window.pageYOffset;
+            
+            // Parallax for project cards
+            document.querySelectorAll('.project-card').forEach((card, index) => {
+                const rect = card.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    const speed = 0.05;
+                    const yPos = -(rect.top - window.innerHeight) * speed;
+                    card.style.transform = `translateY(${yPos}px)`;
+                }
+            });
+            
+            ticking = false;
+        });
+        ticking = true;
+    }
+});
+
+// ==================== END SECTION ENHANCEMENTS ====================
 
 // ==================== Chat Functionality ====================
 // Chat Configuration - Using centralized config
@@ -755,17 +1230,19 @@ function initSkillsRadarChart() {
     skillsChart = new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: ['Python', 'RAG/LLM', 'FastAPI', 'Cloud/Azure', 'Docker/DevOps', 'Vector DBs', 'NLP', 'LangChain'],
+            labels: ['Python', 'RAG/LLM', 'FastAPI', 'Gemini AI', 'LangChain', 'Vector DBs', 'NLP', 'Cloud/DevOps'],
             datasets: [{
                 label: 'Skill Proficiency',
-                data: [95, 92, 90, 88, 85, 90, 87, 88],
-                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                data: [95, 92, 90, 90, 88, 90, 87, 70],
+                backgroundColor: 'rgba(59, 130, 246, 0.3)',
                 borderColor: 'rgba(59, 130, 246, 1)',
-                borderWidth: 2,
+                borderWidth: 3,
                 pointBackgroundColor: 'rgba(59, 130, 246, 1)',
                 pointBorderColor: '#fff',
                 pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgba(59, 130, 246, 1)'
+                pointHoverBorderColor: 'rgba(59, 130, 246, 1)',
+                pointRadius: 5,
+                pointHoverRadius: 7
             }]
         },
         options: {
@@ -774,35 +1251,73 @@ function initSkillsRadarChart() {
             scales: {
                 r: {
                     angleLines: {
-                        color: gridColor
+                        color: gridColor,
+                        lineWidth: 2
                     },
                     grid: {
-                        color: gridColor
+                        color: gridColor,
+                        lineWidth: 1
                     },
                     pointLabels: {
                         color: textColor,
                         font: {
-                            size: 12
-                        }
+                            size: 14,
+                            weight: '600',
+                            family: "'Poppins', sans-serif"
+                        },
+                        padding: 10
                     },
                     ticks: {
                         color: textColor,
                         backdropColor: 'transparent',
                         beginAtZero: true,
+                        min: 0,
                         max: 100,
-                        stepSize: 20
-                    }
+                        stepSize: 20,
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        },
+                        showLabelBackdrop: false
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 100
                 }
             },
             plugins: {
                 legend: {
+                    display: true,
+                    position: 'top',
                     labels: {
                         color: textColor,
                         font: {
-                            size: 14
+                            size: 16,
+                            weight: '600',
+                            family: "'Poppins', sans-serif"
+                        },
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: isDark ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                    titleColor: isDark ? '#ffffff' : '#1a1a1a',
+                    bodyColor: isDark ? '#ffffff' : '#1a1a1a',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 2,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.r + '%';
                         }
                     }
                 }
+            },
+            interaction: {
+                mode: 'nearest',
+                intersect: false
             }
         }
     });
