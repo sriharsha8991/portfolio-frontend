@@ -53,52 +53,55 @@ window.addEventListener('scroll', () => {
 // ==================== HERO SECTION ENHANCEMENTS ====================
 
 // 1. TYPEWRITER EFFECT
-const roles = [
-    'Gen AI Engineer',
-    'RAG Specialist',
-    'LLM Orchestration Expert',
-    'AI Solutions Architect'
-];
-
-let roleIndex = 0;
-let charIndex = 0;
-let isDeleting = false;
-let typewriterDelay = 200;
-
-function typeWriter() {
-    const typewriterElement = document.getElementById('typewriter-text');
-    const currentRole = roles[roleIndex];
+function initTypewriter() {
+    const roles = ['GenAI Engineer', 'Freelancer', 'YouTuber', 'Developer'];
+    let roleIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
     
-    if (!isDeleting) {
-        typewriterElement.textContent = currentRole.substring(0, charIndex);
-        charIndex++;
-        
-        if (charIndex > currentRole.length) {
-            isDeleting = true;
-            typewriterDelay = 2000; // Pause at end
-        } else {
-            typewriterDelay = 100;
-        }
-    } else {
-        typewriterElement.textContent = currentRole.substring(0, charIndex);
-        charIndex--;
-        
-        if (charIndex === 0) {
-            isDeleting = false;
-            roleIndex = (roleIndex + 1) % roles.length;
-            typewriterDelay = 500;
-        } else {
-            typewriterDelay = 50;
-        }
+    const element = document.getElementById('typewriter-text');
+    if (!element) {
+        console.error('Typewriter element not found!');
+        return;
     }
     
-    setTimeout(typeWriter, typewriterDelay);
+    console.log('Typewriter initialized successfully');
+    
+    function type() {
+        const currentRole = roles[roleIndex];
+        
+        if (isDeleting) {
+            element.textContent = currentRole.substring(0, charIndex - 1);
+            charIndex--;
+        } else {
+            element.textContent = currentRole.substring(0, charIndex + 1);
+            charIndex++;
+        }
+        
+        let speed = isDeleting ? 50 : 100;
+        
+        if (!isDeleting && charIndex === currentRole.length) {
+            speed = 5000; // 5 seconds pause
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            roleIndex = (roleIndex + 1) % roles.length;
+            speed = 500;
+        }
+        
+        setTimeout(type, speed);
+    }
+    
+    // Start typing after a short delay
+    setTimeout(type, 500);
 }
 
-// Start typewriter effect when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(typeWriter, 1000);
-});
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTypewriter);
+} else {
+    initTypewriter();
+}
 
 // 2. PARTICLE BACKGROUND
 class ParticleSystem {
