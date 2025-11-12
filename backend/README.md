@@ -1,23 +1,36 @@
 # Portfolio Chat API Backend
 
-FastAPI backend with **Google GenAI SDK** integration for intelligent portfolio conversations.
+FastAPI backend with **Google GenAI SDK** integration and **GitHub Service** for intelligent portfolio conversations.
 
-## 🆕 Updated to Google GenAI SDK (v2.0)
+## 🆕 Latest Updates
 
-This backend now uses the **new Google GenAI SDK** (GA release) as per Google's official migration guide. Benefits include:
-- ✅ Improved developer experience with centralized `Client` object
-- ✅ Better API access patterns through `client.models.*`
-- ✅ Enhanced configuration with `GenerateContentConfig`
-- ✅ Pydantic-based response objects for better type safety
-- ✅ Simplified authentication using environment variables
+### Gemini Tool Calling Integration (v2.0)
+The chat API now uses **Gemini's native function calling** to dynamically fetch information:
+- ✅ Real-time data fetching instead of static context
+- ✅ 5 specialized tools for profile and GitHub data
+- ✅ Automatic tool selection based on user queries
+- ✅ Multi-tool support for complex questions
+- ✅ Transparent tool usage tracking
 
-[Read the Migration Guide →](https://ai.google.dev/gemini-api/docs/migrate)
+[Learn more about Tool Calling →](CHAT_TOOL_CALLING.md)
+
+### GitHub Service Integration
+New comprehensive GitHub service to fetch:
+- 👤 User profiles and statistics
+- 📦 Repositories with detailed information
+- ⭐ Contribution statistics and achievements
+- 🔍 Repository search functionality
+- 💻 Programming language analysis
+
+[Learn more about GitHub Service →](GITHUB_SERVICE.md)
 
 ## Features
 
 - 🤖 **Gemini 2.0 Integration**: Powered by Google's latest Gemini 2.0 Flash Experimental model
+- 🛠️ **Function Calling**: AI automatically calls tools to fetch real-time data
+- 🐙 **GitHub Integration**: Live GitHub profile and repository data
 - 💬 **Real-time Chat**: WebSocket support for instant responses
-- 📄 **Resume Context**: AI uses resume information to answer questions
+- 📄 **Dynamic Context**: AI fetches information on-demand using tools
 - 🛡️ **Smart Filtering**: Only answers questions about Sriharsha's professional background
 - 🚀 **Fast & Efficient**: Built with FastAPI for high performance
 - 📊 **Conversation History**: Maintains context across messages
@@ -27,6 +40,7 @@ This backend now uses the **new Google GenAI SDK** (GA release) as per Google's 
 
 - Python 3.8+
 - Gemini API Key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+- GitHub Personal Access Token (optional but recommended) from [GitHub Settings](https://github.com/settings/tokens)
 
 ## Quick Setup
 
@@ -37,17 +51,22 @@ cd backend
 pip install -r requirements.txt
 ```
 
-**Note**: This will install `google-genai` (the new SDK), not `google-generativeai` (legacy).
+**Note**: This installs `google-genai` (new SDK) and `aiohttp` for GitHub API.
 
-### 2. Get Gemini API Key
+### 2. Get API Keys
 
+**Gemini API Key:**
 1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Click "Create API Key"
 3. Copy your API key
 
-### 3. Configure Environment
+**GitHub Token (Optional but Recommended):**
+1. Visit [GitHub Settings > Tokens](https://github.com/settings/tokens)
+2. Click "Generate new token (classic)"
+3. Select scopes: `public_repo`, `read:user`
+4. Copy your token
 
-The new SDK automatically picks up your API key from environment variables:
+### 3. Configure Environment
 
 Create `.env` file:
 
@@ -55,12 +74,14 @@ Create `.env` file:
 cp .env.example .env
 ```
 
-Edit `.env` and add your API key:
+Edit `.env` and add your keys:
 
-```
-GEMINI_API_KEY=your_actual_api_key_here
-# Or alternatively:
-# GOOGLE_API_KEY=your_actual_api_key_here
+```bash
+# Required
+GOOGLE_API_KEY=your_gemini_api_key_here
+
+# Optional but recommended for GitHub features
+GITHUB_TOKEN=your_github_token_here
 ```
 
 ### 4. Run the Server
@@ -78,6 +99,12 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 Server will start at: `http://localhost:8000`
 
 ## API Endpoints
+
+### Chat API (with Tool Calling)
+
+**POST** `/api/chat`
+
+Send a message and get AI response with automatic tool calling.
 
 ### 1. Health Check
 ```http
@@ -108,19 +135,21 @@ Content-Type: application/json
 ```json
 {
   "response": "Sriharsha has extensive experience with RAG...",
-  "timestamp": "2025-11-03T23:45:00"
+  "timestamp": "2025-11-03T23:45:00",
+  "tools_used": ["get_sriharsha_profile"]
 }
 ```
 
-### 3. Resume Summary
-```http
-GET /api/resume-summary
-```
+**Note**: The `tools_used` field shows which tools were called to answer the query.
 
-**Response:**
-```json
-{
-  "name": "Sriharsha Velicheti",
+### 3. GitHub Endpoints
+
+See [GITHUB_SERVICE.md](GITHUB_SERVICE.md) for detailed documentation on:
+- `GET /github/profile` - Get GitHub profile
+- `GET /github/repositories` - Get repositories
+- `GET /github/stats/{username}` - Get GitHub statistics
+- `GET /github/search/repositories` - Search repositories
+- And more...
   "role": "Gen AI Engineer",
   "key_skills": ["Python", "FastAPI", "RAG", ...]
 }
@@ -171,29 +200,42 @@ response = requests.post(
 print(response.json()["response"])
 ```
 
-## How It Works
+## How It Works (with Tool Calling)
 
-1. **Context Loading**: Resume information is loaded as context
-2. **Prompt Engineering**: System prompt guides AI behavior
-3. **Query Processing**: User questions are combined with resume context
-4. **AI Generation**: Gemini generates factual responses
-5. **Response Validation**: Only professional career topics are discussed
+1. **User Query**: User asks a question via the chat endpoint
+2. **Gemini Analysis**: AI analyzes the query and decides which tools to use
+3. **Tool Selection**: Based on the query, Gemini selects appropriate tools:
+   - Profile questions → `get_sriharsha_profile()`
+   - GitHub questions → GitHub tools
+4. **Tool Execution**: Selected tools fetch real-time data
+5. **Response Generation**: Gemini uses tool responses to formulate answer
+6. **Return**: Final response with `tools_used` metadata
+
+### Available Tools
+
+1. **`get_sriharsha_profile()`** - Professional profile, skills, experience
+2. **`get_github_profile(username)`** - GitHub profile information
+3. **`get_github_repositories(username, sort, limit)`** - Repository list
+4. **`get_github_stats(username)`** - GitHub statistics
+5. **`search_github_repositories(query, sort, limit)`** - Repository search
 
 ## AI Behavior
 
 The AI assistant will:
 
 ✅ Answer questions about:
-- Professional experience
-- Technical skills
+- Professional experience and work history
+- Technical skills and expertise
 - Projects and achievements
 - Education background
 - Career accomplishments
+- GitHub repositories and statistics
+- Coding projects and contributions
 
 ❌ Politely decline to answer:
 - Personal life questions
 - Off-topic conversations
-- Information not in resume
+- Information not available via tools
 - Speculative questions
 
 ## Example Conversations
@@ -202,15 +244,33 @@ The AI assistant will:
 - "What experience does Sriharsha have with LLMs?"
 - "Tell me about the TenderGenie project"
 - "What are his key technical skills?"
-- "Where did he study?"
-- "What achievements has he earned?"
+- "Show me his GitHub repositories"
+- "What are his most popular GitHub projects?"
+- "Find his Python projects on GitHub"
+- "What are his GitHub statistics?"
 
-**Off-Topic Handling:**
+**How AI Uses Tools:**
 ```
-User: "What's the weather today?"
-AI: "I'm here to help you learn about Sriharsha's professional 
-     background. Please ask me about his experience, skills, 
-     projects, or education."
+User: "What are Sriharsha's skills in AI?"
+AI: Calls get_sriharsha_profile() → Gets skills data → Responds with specific skills
+
+User: "Show me his GitHub projects"
+AI: Calls get_github_repositories() → Gets repos → Lists projects with details
+
+User: "Tell me about his work and show GitHub stats"
+AI: Calls get_sriharsha_profile() AND get_github_stats() → Combines data → Comprehensive response
+```
+
+## Testing
+
+### Test Chat with Tools
+```bash
+python test_chat_tools.py
+```
+
+### Test GitHub Service
+```bash
+python test_github.py
 ```
 
 ## Production Deployment
