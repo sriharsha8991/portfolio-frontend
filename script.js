@@ -901,6 +901,11 @@ async function sendChatMessage() {
             removeLoadingMessage();
             displayAssistantMessage(data.response);
             
+            // Handle navigation actions
+            if (data.actions && data.actions.length > 0) {
+                handleChatActions(data.actions);
+            }
+            
             // Update history
             chatHistory.push({
                 user: message,
@@ -916,6 +921,92 @@ async function sendChatMessage() {
         input.disabled = false;
         document.getElementById('chat-send-btn').disabled = false;
         input.focus();
+    }
+}
+
+// Handle actions from chat response
+function handleChatActions(actions) {
+    actions.forEach(action => {
+        if (action.type === 'navigate' && action.section_id) {
+            // Delay navigation slightly so user can see the message
+            setTimeout(() => {
+                navigateToSection(action.section_id, action.audio_text);
+            }, 300);
+        }
+    });
+}
+
+// Navigate to a specific section with optional audio announcement
+function navigateToSection(sectionId, audioText = null) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        const offsetTop = section.offsetTop - 80; // 80px offset for navbar
+        window.scrollTo({
+            top: offsetTop,
+            behavior: 'smooth'
+        });
+        
+        // Optional: Add brief highlight effect
+        section.classList.add('section-highlight');
+        setTimeout(() => {
+            section.classList.remove('section-highlight');
+        }, 2000);
+        
+        // Update URL hash
+        history.pushState(null, null, `#${sectionId}`);
+        
+        // Play audio announcement if provided
+        if (audioText) {
+            playAudioAnnouncement(audioText);
+        }
+    }
+}
+
+// Play audio announcement using Web Speech API
+function playAudioAnnouncement(text) {
+    // Check if browser supports Speech Synthesis
+    if ('speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+        
+        // Create speech utterance
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Configure voice settings
+        utterance.rate = 1.0;  // Normal speed
+        utterance.pitch = 1.0; // Normal pitch
+        utterance.volume = 0.9; // High volume
+        
+        // Function to set voice
+        const setVoice = () => {
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                // Prefer English female voices for better clarity
+                const preferredVoice = voices.find(voice => 
+                    voice.lang.startsWith('en') && (
+                        voice.name.includes('Female') || 
+                        voice.name.includes('Google') ||
+                        voice.name.includes('Samantha')
+                    )
+                ) || voices.find(voice => voice.lang.startsWith('en'));
+                
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                }
+                
+                // Speak the text
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+        
+        // Voices might not be loaded immediately, so wait for them
+        if (window.speechSynthesis.getVoices().length > 0) {
+            setVoice();
+        } else {
+            window.speechSynthesis.onvoiceschanged = setVoice;
+        }
+    } else {
+        console.log('Speech synthesis not supported');
     }
 }
 
