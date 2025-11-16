@@ -4,7 +4,10 @@ services:
     runtime: python
     region: oregon
     plan: free
-    buildCommand: pip install -r requirements.txt
+    rootDir: backend
+    buildCommand: |
+      pip install -r requirements.txt
+      cp ../sections.json /opt/render/project/src/sections.json || cp ../sections.json ./sections.json
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GEMINI_API_KEY

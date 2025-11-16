@@ -28,8 +28,22 @@ class NavigationService:
         self.model_name = 'gemini-2.5-flash'
         self.client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
         
-        # Load sections data
-        sections_file = Path(__file__).resolve().parent.parent.parent.parent / "sections.json"
+        # Load sections data - try multiple paths for different environments
+        possible_paths = [
+            Path('/app/sections.json'),  # Docker container path
+            Path(__file__).resolve().parent.parent.parent.parent / 'sections.json',  # Local development
+            Path('/opt/render/project/src/sections.json'),  # Render deployment path
+            Path(__file__).resolve().parent.parent.parent / 'sections.json',  # Render relative path
+        ]
+        
+        sections_file = None
+        for path in possible_paths:
+            if path.exists():
+                sections_file = path
+                break
+        
+        if not sections_file:
+            raise FileNotFoundError(f"sections.json not found in any of: {[str(p) for p in possible_paths]}")
         
         with open(sections_file, 'r', encoding='utf-8') as f:
             sections_data = json.load(f)

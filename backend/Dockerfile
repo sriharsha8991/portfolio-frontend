@@ -12,6 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Copy sections.json from parent directory
+COPY ../sections.json /app/sections.json
+
 # Expose port (Cloud Run uses PORT env var)
 EXPOSE 8080
 
