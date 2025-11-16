@@ -1,0 +1,93 @@
+{
+  "personal_info": {
+    "name": "Sriharsha Velicheti",
+    "role": "Gen AI Engineer",
+    "company": "DatasmithAI",
+    "email": "srih8991@gmail.com",
+    "phone": "+91 8309012139",
+    "github": "github.com/sriharsha8991",
+    "linkedin": "linkedin.com/in/sriharsha-velicheti"
+  },
+  
+  "summary": "Generative AI Engineer with expertise in Retrieval-Augmented Generation (RAG) and LLM orchestration, skilled in developing scalable AI assistants that extract contextual insights from unstructured data. Proficient in LangChain, Gemini AI, and cloud platforms like Azure and GCP, with a strong focus on building production-grade, efficient AI solutions. Passionate about leveraging Generative AI to solve real-world challenges in finance and manufacturing.",
+  
+  "skills": {
+    "programming": ["Python", "FastAPI development","TypeScript", "system design"],
+    "llm_integration": ["Gemini", "OpenAI", "HuggingFace", "LangChain"],
+    "devops": ["Docker", "CI/CD pipelines", "Azure DevOps"],
+    "cloud": ["Azure Cloud Services", "GCP", "Azure Logic Apps and Integrations", "Azure Cognitive Services"],
+    "databases": ["Qdrant", "SQL"],
+    "other": ["RAG architectures", "NLP", "spaCy", "scikit-learn", "PyPDF2"]
+  },
+  
+  "experience": [
+    {
+      "project": "TenderGenie (Document Intelligence Application)",
+      "company": "DatasmithAI",
+      "period": "Nov 2024 - Present",
+      "role": "Gen AI Engineer",
+      "achievements": [
+        "Overcame the challenge of manually reviewing lengthy manufacturing tenders, decreasing reading time by 10x",
+        "Developed and deployed retrieval-based RAG conversational assistant with document summarization, keyword extraction, and complex datasheet extraction",
+        "Achieved custom evaluation accuracy of 89.77%",
+        "Lightning-fast keyword extraction in under 10 seconds using Aho-Corasick Engine (100x efficiency improvement)"
+      ],
+      "tech_stack": ["Python", "Docker", "Gemini AI", "Qdrant", "FastAPI", "Azure services"]
+    },
+    {
+      "project": "Multimodel RAG Application",
+      "company": "Siemens",
+      "period": "Jan 2024 - May 2024",
+      "role": "Research Intern",
+      "achievements": [
+        "Conducted comprehensive research on end-to-end RAG architectures",
+        "PDF ingestion, structured data extraction, schema-aware parsing, workflow automation",
+        "Executed multi-LLM response generation and benchmarking",
+        "Incorporated integrated PID diagrams into knowledge graphs using Graph-RAG concepts"
+      ],
+      "tech_stack": ["Python", "poetry", "RAGAS", "SQL", "pypdf2 parsers"]
+    }
+  ],
+  
+  "projects": [
+    {
+      "name": "Resume Filtering System for HR",
+      "type": "POC",
+      "description": "AI-powered resume management system with automated filtering, ranking, and classification through agentic classification. NLP-based candidate analysis with skill extraction and technical proficiency scoring. Interactive visualizations using Plotly and Matplotlib. LLM as judge for assessing strengths and weaknesses.",
+      "tech_stack": ["Python", "Streamlit", "spaCy", "scikit-learn", "PyPDF2", "Qdrant", "Groq AI"],
+      "features": [
+        "AI-powered resume management",
+        "Automated filtering and ranking",
+        "Agentic classification",
+        "Skill extraction",
+        "Technical proficiency scoring",
+        "Interactive visualizations",
+        "LLM as judge"
+      ]
+    },
+    {
+      "name": "Additional AI Projects",
+      "type": "POC",
+      "description": "AI-driven interview question generation, market salary analysis with accessibility features",
+      "tech_stack": ["Python", "Streamlit", "LLMs"]
+    }
+  ],
+  
+  "education": {
+    "institution": "Jain University, Bengaluru",
+    "degree": "Bachelor of Technologies CSE (Data Science)",
+    "specialization": "Honors in Data Science",
+    "cgpa": "8.756",
+    "period": "Aug 2020 - June 2024"
+  },
+  
+  "accomplishments": [
+    "TenderGenie Product Deployed: 3 business clients in less than a year at DatasmithAI",
+    "Secured 3 bronze medals in Kaggle as a contributor",
+    "Secured 6th individual position out of 159 participants in MACHINE HACK hackathon with 92.6% accuracy",
+    "Successful Workshop on Generative AI at I2IT Pune College, representing DatasmithAI",
+    "President of Data Science Student Club (10 months)",
+    "Data Science Facilitator at Google Developer Student Club for a year, mentored over 100 students in AI/DS/ML",
+    "NPTEL certification on Python for Data Science with 69% score from IIT"
+  ]
+}

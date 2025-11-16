@@ -1,0 +1,52 @@
+{
+  "sections": [
+    {
+      "id": "home",
+      "name": "Home",
+      "link": "#home",
+      "description": "Hero section introducing Sriharsha Velicheti as a Gen AI Engineer specializing in RAG and LLM orchestration"
+    },
+    {
+      "id": "about",
+      "name": "About",
+      "link": "#about",
+      "description": "Overview of professional background, expertise in Generative AI, and key statistics showcasing experience and project impact"
+    },
+    {
+      "id": "experience",
+      "name": "Experience",
+      "link": "#experience",
+      "description": "Professional work history timeline including roles at Datasmith AI, Inteliment, and previous positions with key responsibilities"
+    },
+    {
+      "id": "projects",
+      "name": "Projects",
+      "link": "#projects",
+      "description": "Showcase of notable projects including AI Multi-Agent System, RAG Framework, Portfolio Website, and LLM Orchestration Platform"
+    },
+    {
+      "id": "skills",
+      "name": "Skills",
+      "link": "#skills",
+      "description": "Technical skills categorized into AI/ML (LangChain, OpenAI, RAG), Programming Languages (Python, JavaScript), and Cloud & Tools (AWS, Docker, Git)"
+    },
+    {
+      "id": "github",
+      "name": "GitHub",
+      "link": "#github",
+      "description": "GitHub activity statistics, contribution graphs, and featured repositories showcasing open-source contributions"
+    },
+    {
+      "id": "education",
+      "name": "Education",
+      "link": "#education",
+      "description": "Academic background including B.Tech in Computer Science and Engineering from GRIET, along with certifications and accomplishments"
+    },
+    {
+      "id": "contact",
+      "name": "Contact",
+      "link": "#contact",
+      "description": "Contact form and information to get in touch via email, phone, LinkedIn, or GitHub for collaboration opportunities"
+    }
+  ]
+}

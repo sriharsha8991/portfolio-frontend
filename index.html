@@ -23,6 +23,9 @@
     <!-- EmailJS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
+    <!-- Markdown-it for Chat Formatting -->
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -48,8 +51,24 @@
     </script>
     
     <style>
+        /* Smooth Transitions */
         * {
             scroll-behavior: smooth;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        /* Section highlight effect when navigated to from chat */
+        .section-highlight {
+            animation: sectionGlow 2s ease-in-out;
+        }
+        
+        @keyframes sectionGlow {
+            0%, 100% {
+                box-shadow: none;
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+            }
         }
         
         body {
@@ -129,7 +148,8 @@
         }
         
         .project-card:hover {
-            transform: translateY(-8px);
+            transform: scale(1.02);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
         }
         
         /* Timeline */
@@ -178,44 +198,354 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            width: 60px;
-            height: 60px;
+            cursor: pointer;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .chat-button-circle {
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
             transition: all 0.3s ease;
-            z-index: 999;
+            position: relative;
+            animation: chatPulse 2s ease-in-out infinite;
         }
         
-        .chat-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
+        /* Pulsing ring effect */
+        .chat-button-circle::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            opacity: 0.3;
+            animation: ringPulse 2s ease-in-out infinite;
+            z-index: -1;
+        }
+        
+        /* Outer glow ring */
+        .chat-button-circle::after {
+            content: '';
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            opacity: 0.15;
+            animation: ringPulse 2s ease-in-out infinite 0.5s;
+            z-index: -2;
+        }
+        
+        @keyframes chatPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 10px 35px rgba(59, 130, 246, 0.7);
+            }
+        }
+        
+        @keyframes ringPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: scale(1.15);
+                opacity: 0;
+            }
+        }
+        
+        .chat-button:hover .chat-button-circle {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.8);
+        }
+        
+        .chat-button-label {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            white-space: nowrap;
+            animation: fadeInUp 0.5s ease-out 0.5s both;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chat-button:hover .chat-button-label {
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        /* Status indicator */
+        .chat-button-status {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 14px;
+            height: 14px;
+            background: #10b981;
+            border-radius: 50%;
+            border: 3px solid white;
+            animation: statusBlink 2s ease-in-out infinite;
+        }
+        
+        @keyframes statusBlink {
+            0%, 100% {
+                opacity: 1;
+                box-shadow: 0 0 10px #10b981;
+            }
+            50% {
+                opacity: 0.6;
+                box-shadow: 0 0 20px #10b981;
+            }
         }
         
         .chat-panel {
             position: fixed;
-            bottom: 100px;
-            right: 30px;
-            width: 350px;
-            height: 500px;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            bottom: 90px;
+            right: 20px;
+            width: 380px;
+            max-width: calc(100vw - 40px);
+            height: 550px;
+            max-height: calc(100vh - 120px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             display: none;
             flex-direction: column;
             z-index: 998;
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            overflow: hidden;
         }
         
         .chat-panel.active {
             display: flex;
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
+        }
+        
+        /* Chat Messages Scrollbar */
+        #chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 3px;
+        }
+        
+        #chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.5);
+        }
+        
+        /* Chat Message Bubbles */
+        .chat-message {
+            animation: messageSlideIn 0.3s ease-out;
+            margin-bottom: 12px;
+        }
+        
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chat-message-content {
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+        
+        .chat-message-content a {
+            color: #3b82f6;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
+        
+        .chat-message-content a:hover {
+            color: #2563eb;
+        }
+        
+        .dark .chat-message-content a {
+            color: #60a5fa;
+        }
+        
+        .dark .chat-message-content a:hover {
+            color: #93c5fd;
+        }
+        
+        .chat-message-content code {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875em;
+        }
+        
+        .dark .chat-message-content code {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-message-content pre {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+        
+        .dark .chat-message-content pre {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .chat-message-content pre code {
+            background: transparent;
+            padding: 0;
+        }
+        
+        .chat-message-content ul,
+        .chat-message-content ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        .chat-message-content li {
+            margin: 4px 0;
+        }
+        
+        .chat-message-content blockquote {
+            border-left: 3px solid #3b82f6;
+            padding-left: 12px;
+            margin: 8px 0;
+            font-style: italic;
+            color: #6b7280;
+        }
+        
+        .dark .chat-message-content blockquote {
+            color: #9ca3af;
+        }
+        
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #3b82f6;
+            animation: typingBounce 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingBounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        /* Chat Input Enhancement */
+        .chat-input-wrapper {
+            position: relative;
+        }
+        
+        .chat-input-wrapper textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 640px) {
+            .chat-panel {
+                width: calc(100vw - 30px);
+                height: calc(100vh - 110px);
+                right: 15px;
+                bottom: 85px;
+                border-radius: 16px;
+            }
+            
+            .chat-button {
+                right: 15px;
+                bottom: 15px;
+                width: 56px;
+                height: 56px;
+            }
+        }
+        
+        /* Tablet Responsiveness */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .chat-panel {
+                width: 360px;
+                height: 520px;
+                right: 20px;
+                bottom: 90px;
+            }
+        }
+        
+        /* Large Desktop */
+        @media (min-width: 1440px) {
+            .chat-panel {
+                width: 420px;
+                height: 600px;
+                right: 30px;
+                bottom: 100px;
+            }
+            
+            .chat-button {
+                right: 30px;
+                bottom: 30px;
+            }
         }
         
         /* Skill Badge */
@@ -257,6 +587,8 @@
         .profile-container {
             position: relative;
             transition: transform 0.1s ease-out;
+            margin: 0 auto;
+            width: fit-content;
         }
 
         .profile-glow {
@@ -287,10 +619,10 @@
 
         /* Code Badge Pulse */
         .code-badge-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            animation: badgePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
-        @keyframes pulse {
+        @keyframes badgePulse {
             0%, 100% { 
                 opacity: 1;
                 transform: scale(1);
@@ -338,7 +670,7 @@
         /* Magnetic Buttons */
         .magnetic-btn {
             position: relative;
-            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .magnetic-btn::before {
@@ -354,6 +686,15 @@
         .magnetic-btn:hover::before {
             opacity: 0.2;
             animation: ripple 1s ease-out infinite;
+        }
+
+        /* Smooth link transitions */
+        a, button {
+            transition: all 0.3s ease;
+        }
+
+        a:hover, button:hover {
+            transform: translateY(-1px);
         }
 
         @keyframes ripple {
@@ -386,7 +727,7 @@
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
             pointer-events: auto;
             cursor: grab;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             white-space: nowrap;
@@ -399,6 +740,18 @@
 
         .skill-pill:active {
             cursor: grabbing;
+        }
+
+        /* Mobile skill pill adjustments */
+        @media (max-width: 767px) {
+            .skill-pill {
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+            
+            .skill-orbit-container {
+                display: none; /* Hide orbiting skills on very small screens */
+            }
         }
 
         /* Icon animations in skills */
@@ -427,174 +780,217 @@
             z-index: 1;
         }
 
-        /* ==================== SECTION BACKGROUND PATTERNS ==================== */
+        /* ==================== UNIFIED SECTION STYLING ==================== */
         
-        /* Animated Gradient Background */
-        .gradient-bg {
-            background: linear-gradient(-45deg, #f3f4f6, #dbeafe, #e0e7ff, #fae8ff);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+        /* Clean, consistent background for all sections */
+        section {
+            background-color: #ffffff;
+            padding: 5rem 1.5rem;
         }
 
-        .dark .gradient-bg {
-            background: linear-gradient(-45deg, #1a1a1a, #1e293b, #1e1b4b, #2e1065);
-            background-size: 400% 400%;
+        .dark section {
+            background-color: #0f172a;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Dot Pattern Background */
-        .dot-pattern {
-            background-image: radial-gradient(circle, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-
-        .dark .dot-pattern {
-            background-image: radial-gradient(circle, rgba(59, 130, 246, 0.2) 1px, transparent 1px);
-        }
-
-        /* Grid Pattern Background */
-        .grid-pattern {
-            background-image: 
-                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-        }
-
-        .dark .grid-pattern {
-            background-image: 
-                linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
-        }
-
-        /* Diagonal Lines Pattern */
-        .diagonal-lines {
-            background-image: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 35px,
-                rgba(59, 130, 246, 0.05) 35px,
-                rgba(59, 130, 246, 0.05) 70px
-            );
-        }
-
-        .dark .diagonal-lines {
-            background-image: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 35px,
-                rgba(59, 130, 246, 0.1) 35px,
-                rgba(59, 130, 246, 0.1) 70px
-            );
-        }
-
-        /* Mesh Gradient Background */
-        .mesh-gradient {
-            background: 
-                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
-                radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
-        }
-
-        .dark .mesh-gradient {
-            background: 
-                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
-                radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%);
-        }
-
-        /* Waves Background */
-        .waves-bg {
-            background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
-            position: relative;
-        }
-
-        .dark .waves-bg {
-            background: linear-gradient(to bottom, #0a0a0a 0%, #1a1a1a 100%);
-        }
-
-        .waves-bg::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 100px;
-            background: 
-                radial-gradient(ellipse at top, rgba(59, 130, 246, 0.1), transparent),
-                radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.1), transparent);
-            opacity: 0.5;
-        }
-
-        /* Geometric Shapes Background */
-        .geometric-bg {
+        /* Alternating subtle backgrounds for visual separation */
+        section:nth-child(even) {
             background-color: #f9fafb;
-            background-image: 
-                linear-gradient(30deg, rgba(59, 130, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.05) 87.5%, rgba(59, 130, 246, 0.05)),
-                linear-gradient(150deg, rgba(59, 130, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.05) 87.5%, rgba(59, 130, 246, 0.05)),
-                linear-gradient(30deg, rgba(139, 92, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(139, 92, 246, 0.05) 87.5%, rgba(139, 92, 246, 0.05)),
-                linear-gradient(150deg, rgba(139, 92, 246, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(139, 92, 246, 0.05) 87.5%, rgba(139, 92, 246, 0.05));
-            background-size: 80px 140px;
-            background-position: 0 0, 0 0, 40px 70px, 40px 70px;
         }
 
-        .dark .geometric-bg {
-            background-color: #1a1a1a;
-            background-image: 
-                linear-gradient(30deg, rgba(59, 130, 246, 0.1) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.1) 87.5%, rgba(59, 130, 246, 0.1)),
-                linear-gradient(150deg, rgba(59, 130, 246, 0.1) 12%, transparent 12.5%, transparent 87%, rgba(59, 130, 246, 0.1) 87.5%, rgba(59, 130, 246, 0.1)),
-                linear-gradient(30deg, rgba(139, 92, 246, 0.1) 12%, transparent 12.5%, transparent 87%, rgba(139, 92, 246, 0.1) 87.5%, rgba(139, 92, 246, 0.1)),
-                linear-gradient(150deg, rgba(139, 92, 246, 0.1) 12%, transparent 12.5%, transparent 87%, rgba(139, 92, 246, 0.1) 87.5%, rgba(139, 92, 246, 0.1));
+        .dark section:nth-child(even) {
+            background-color: #1e293b;
         }
 
-        /* Blur Orbs Background */
-        .blur-orbs {
+        /* Hero section special styling */
+        #home {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding-top: 6rem;
+            padding-bottom: 5rem;
             position: relative;
-            overflow: hidden;
+            z-index: 1;
         }
 
-        .blur-orbs::before,
-        .blur-orbs::after {
-            content: '';
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.3;
-            z-index: 0;
-            animation: floatOrb 20s ease-in-out infinite;
+        .dark #home {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         }
 
-        .blur-orbs::before {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(139, 92, 246, 0.4));
-            top: -200px;
-            left: -200px;
+        /* Hero section grid responsive */
+        #home .grid {
+            display: grid;
+            gap: 3rem;
+            align-items: center;
         }
 
-        .blur-orbs::after {
-            background: linear-gradient(135deg, rgba(236, 72, 153, 0.4), rgba(16, 185, 129, 0.4));
-            bottom: -200px;
-            right: -200px;
-            animation-delay: -10s;
+        /* Desktop: text left, image right */
+        @media (min-width: 768px) {
+            #home .grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
-        @keyframes floatOrb {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
+        /* Mobile: image on top, text below */
+        @media (max-width: 767px) {
+            #home .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Reverse order for mobile - profile first */
+            #home .grid > div:first-child {
+                order: 2;
+            }
+            
+            #home .grid > div:last-child {
+                order: 1;
+            }
+            
+            /* Reduce profile size on mobile */
+            .profile-container .w-80 {
+                width: 16rem !important;
+                height: 16rem !important;
+            }
+            
+            .profile-container .w-24 {
+                width: 5rem !important;
+                height: 5rem !important;
+            }
+            
+            /* Smaller skill pills on mobile */
+            .skill-pill {
+                font-size: 0.75rem;
+                padding: 6px 12px;
+            }
         }
 
-        /* Section-specific backgrounds */
+        /* About section spacing adjustment */
+        #about {
+            position: relative;
+            z-index: 2;
+            margin-top: 0;
+        }
+
+        /* Ensure proper stacking context */
+        section {
+            position: relative;
+            isolation: isolate;
+        }
+
+        /* Mobile spacing fixes */
+        @media (max-width: 767px) {
+            #home {
+                min-height: auto !important;
+            }
+            
+            #home .hero-content {
+                padding-bottom: 2rem;
+            }
+            
+            /* Center profile on mobile */
+            #home .flex.justify-center {
+                justify-content: center !important;
+            }
+            
+            /* Adjust spacing between profile and text */
+            #home .grid {
+                gap: 2rem !important;
+            }
+        }
+
+        /* Consistent max-width and centering for all sections */
+        section > div {
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Section content wrapper */
         .section-content {
             position: relative;
             z-index: 1;
+        }
+
+        /* Unified card styling */
+        .experience-card,
+        .project-card,
+        .skill-category-card,
+        .github-stat-card,
+        .education-card,
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dark .experience-card,
+        .dark .project-card,
+        .dark .skill-category-card,
+        .dark .github-stat-card,
+        .dark .education-card,
+        .dark .stat-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Consistent section titles */
+        .section-title {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Responsive padding adjustments */
+        @media (max-width: 768px) {
+            section {
+                padding: 3rem 1rem;
+            }
+            
+            #home {
+                padding-top: 5rem;
+                padding-bottom: 3rem;
+                min-height: auto;
+            }
+            
+            /* Reduce text size on mobile */
+            #home h1 {
+                font-size: 2.5rem !important;
+            }
+            
+            #home h2 {
+                font-size: 1.5rem !important;
+            }
+            
+            #home p {
+                font-size: 1rem !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            section {
+                padding: 2.5rem 1rem;
+            }
+            
+            #home {
+                padding-top: 4.5rem;
+                padding-bottom: 2.5rem;
+            }
+            
+            #home h1 {
+                font-size: 2rem !important;
+            }
+            
+            #home h2 {
+                font-size: 1.25rem !important;
+            }
+            
+            /* Stack buttons vertically on small mobile */
+            #home .flex-wrap {
+                flex-direction: column;
+            }
+            
+            #home .flex-wrap > a {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
         }
 
         /* ==================== SECTION ENHANCEMENTS ==================== */
@@ -673,31 +1069,24 @@
         /* Project Cards */
         .project-card {
             position: relative;
-            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .project-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .project-card:hover {
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
         }
 
-        .project-card:hover::before {
-            opacity: 1;
+        .dark .project-card:hover {
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
         }
 
         .project-icon {
-            transition: all 0.4s ease;
+            transition: transform 0.3s ease;
         }
 
         .project-card:hover .project-icon {
-            transform: scale(1.1) rotateY(180deg);
+            transform: scale(1.1);
         }
 
         /* Skills Section */
@@ -730,96 +1119,73 @@
         .skill-category-card {
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
         }
 
-        .skill-category-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
-            transition: left 0.5s ease;
+        .skill-category-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
         }
 
-        .skill-category-card:hover::before {
-            left: 100%;
+        .dark .skill-category-card:hover {
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
         }
 
         /* GitHub Section */
         .github-stat-card {
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
-        }
-
-        .github-stat-card::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.2), transparent);
-            transform: translate(-50%, -50%);
-            transition: width 0.5s ease, height 0.5s ease;
-        }
-
-        .github-stat-card:hover::before {
-            width: 300px;
-            height: 300px;
         }
 
         .github-stat-card:hover {
-            transform: translateY(-8px) scale(1.05);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+        }
+
+        .dark .github-stat-card:hover {
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
         }
 
         .repo-card {
             transition: all 0.3s ease;
-            border-left: 4px solid transparent;
         }
 
         .repo-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
             border-left-color: #3b82f6;
-            transform: translateX(8px);
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .dark .repo-card:hover {
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
         }
 
         /* Education Section */
         .education-card {
             position: relative;
-            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .education-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent 70%);
-            opacity: 0;
-            transition: opacity 0.5s ease;
+        .education-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
         }
 
-        .education-card:hover::before {
-            opacity: 1;
+        .dark .education-card:hover {
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
         }
 
         .accomplishment-item {
             transition: all 0.3s ease;
-            padding-left: 15px;
-            border-left: 3px solid transparent;
+            padding-left: 12px;
         }
 
         .accomplishment-item:hover {
-            border-left-color: #3b82f6;
             background: rgba(59, 130, 246, 0.05);
-            transform: translateX(10px);
+            transform: translateX(8px);
+        }
+
+        .dark .accomplishment-item:hover {
+            background: rgba(59, 130, 246, 0.1);
         }
 
         /* Contact Section */
@@ -959,7 +1325,7 @@
     </nav>
     
     <!-- Hero Section -->
-    <section id="home" class="min-h-screen flex items-center justify-center pt-20 px-6 relative overflow-hidden">
+    <section id="home" class="min-h-screen flex items-center justify-center relative overflow-hidden">
         <!-- Particle Canvas Background -->
         <canvas id="particle-canvas"></canvas>
         
@@ -975,15 +1341,14 @@
                     <div class="space-y-2">
                         <p class="text-lg text-gray-600 dark:text-gray-400">Hello, I'm</p>
                         <h1 class="text-5xl md:text-6xl font-bold font-poppins gradient-text">Sriharsha Velicheti</h1>
-                        <h2 class="text-2xl md:text-3xl font-semibold">
+                        <h2 class="text-2xl md:text-3xl font-semibold text-gray-700 dark:text-gray-300">
                             <span class="typewriter" id="typewriter-text"></span>
                         </h2>
                     </div>
                     
                     <p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-                        Specializing in Retrieval-Augmented Generation (RAG) and LLM orchestration, 
-                        building scalable AI assistants that extract contextual insights from unstructured data.
-                    </p>
+                        First of all thanks for landing here and congratulations for finding me who will help you in achieving your goals faster. <p><b>Curious about me? My assistant’s chillin’ in the bottom-right corner 🤖 — hit her up and dive into my world. she will help you navigate through portfolio and know more about me </b></p>
+ </p>
                     
                     <div class="flex flex-wrap gap-4">
                         <a href="#contact" class="magnetic-btn px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
@@ -1022,13 +1387,13 @@
                                 <i class="fas fa-brain"></i>RAG
                             </div>
                             <div class="skill-pill" data-angle="144">
-                                <i class="fas fa-link"></i>LangChain
+                                <i class="fas fa-link"></i>AI Agents
                             </div>
                             <div class="skill-pill" data-angle="216">
-                                <i class="fab fa-microsoft"></i>Azure
+                                <i class="fab fa-microsoft"></i>Azure DevOps
                             </div>
                             <div class="skill-pill" data-angle="288">
-                                <i class="fas fa-gem"></i>Gemini AI
+                                <i class="fas fa-gem"></i>LLMS
                             </div>
                         </div>
                         
@@ -1054,7 +1419,7 @@
     </section>
     
     <!-- About Section -->
-    <section id="about" class="py-20 px-6 gradient-bg reveal">
+    <section id="about" class="reveal">
         <div class="max-w-7xl mx-auto section-content">
             <h2 class="text-4xl font-bold font-poppins mb-12 text-center section-title">About Me</h2>
             
@@ -1066,8 +1431,7 @@
                                 <i class="fas fa-user-tie text-white text-xl"></i>
                             </div>
                             <p class="text-lg leading-relaxed text-gray-600 dark:text-gray-400">
-                                I am a <span class="font-semibold text-blue-500">Generative AI Engineer</span> with expertise in Retrieval-Augmented Generation (RAG) and LLM orchestration, 
-                                skilled in developing scalable AI assistants that extract contextual insights from unstructured data. 
+                                I’m a <span class="font-semibold text-blue-500">Generative AI Engineer</span> specializing in Retrieval-Augmented Generation (RAG) and advanced LLM orchestration — I build AI systems that turn messy, unstructured data into precise, contextual answers.
                             </p>
                         </div>
                         
@@ -1076,8 +1440,7 @@
                                 <i class="fas fa-code text-white text-xl"></i>
                             </div>
                             <p class="text-lg leading-relaxed text-gray-600 dark:text-gray-400">
-                                Proficient in <span class="font-semibold text-purple-500">LangChain, Gemini AI</span>, and cloud platforms like <span class="font-semibold text-blue-500">Azure and GCP</span>, with a strong focus on building 
-                                production-grade, efficient AI solutions.
+                                I design and deploy <span class="font-semibold text-purple-500">production-grade AI applications</span> on <span class="font-semibold text-blue-500">Azure and GCP</span>, focusing on performance, scalability, and real-world usability — not just prototypes.
                             </p>
                         </div>
                         
@@ -1086,13 +1449,12 @@
                                 <i class="fas fa-lightbulb text-white text-xl"></i>
                             </div>
                             <p class="text-lg leading-relaxed text-gray-600 dark:text-gray-400">
-                                Passionate about leveraging Generative AI to solve real-world challenges in <span class="font-semibold text-green-500">finance and manufacturing</span>, 
-                                with a proven ability to collaborate across teams and adapt to emerging technologies and methodologies.
+                                Currently applying Generative AI to solve high-impact challenges in <span class="font-semibold text-green-500">finance and manufacturing</span> — delivering measurable outcomes by working across teams, tech stacks, and problem domains.
                             </p>
                         </div>
                     </div>
                 </div>
-                
+            
                 <div class="grid md:grid-cols-3 gap-6 mt-8">
                     <div class="stat-card bg-white dark:bg-dark-bg rounded-xl p-6 text-center shadow-lg glow-on-hover" data-count="2">
                         <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
@@ -1121,7 +1483,7 @@
     </section>
     
     <!-- Experience Section -->
-    <section id="experience" class="py-20 px-6 dot-pattern reveal">
+    <section id="experience" class="reveal">
         <div class="max-w-7xl mx-auto section-content">
             <h2 class="text-4xl font-bold font-poppins mb-12 text-center section-title">Professional Experience</h2>
             
@@ -1205,7 +1567,7 @@
     </section>
     
     <!-- Projects Section -->
-    <section id="projects" class="py-20 px-6 mesh-gradient reveal">
+    <section id="projects" class="reveal">
         <div class="max-w-7xl mx-auto section-content">
             <h2 class="text-4xl font-bold font-poppins mb-12 text-center section-title">Personal Projects</h2>
             
@@ -1289,7 +1651,7 @@
     </section>
     
     <!-- Skills Section -->
-    <section id="skills" class="py-20 px-6 diagonal-lines reveal">
+    <section id="skills" class="reveal">
         <div class="max-w-7xl mx-auto section-content">
             <h2 class="text-4xl font-bold font-poppins mb-12 text-center section-title">Skills & Technologies</h2>
             
@@ -1297,7 +1659,7 @@
             <div class="flex justify-center mb-8">
                 <div class="inline-flex rounded-lg border-2 border-gray-300 dark:border-gray-700 overflow-hidden shadow-md">
                     <button onclick="switchSkillView('bars')" id="btn-bars" class="px-6 py-3 bg-blue-500 text-white transition hover:bg-blue-600 font-semibold">
-                        <i class="fas fa-chart-bar mr-2"></i>Progress Bars
+                        <i class="fas fa-chart-bar mr-2"></i>Confidence Bars
                     </button>
                     <button onclick="switchSkillView('chart')" id="btn-chart" class="px-6 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-semibold">
                         <i class="fas fa-chart-area mr-2"></i>Radar Chart
@@ -1512,7 +1874,7 @@
     </section>
     
     <!-- GitHub Activity Section -->
-    <section id="github" class="py-20 px-6 blur-orbs reveal">
+    <section id="github" class="reveal">
         <div class="max-w-7xl mx-auto section-content">
             <h2 class="text-4xl font-bold font-poppins mb-12 text-center section-title">GitHub Activity</h2>
             
@@ -1522,7 +1884,7 @@
                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                         <i class="fab fa-github text-white text-2xl"></i>
                     </div>
-                    <div class="text-4xl font-bold stat-number mb-2" id="github-repos" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">--</div>
+                    <div class="text-4xl font-bold stat-number mb-2" id="github-repos" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: transparent;">--</div>
                     <div class="text-gray-600 dark:text-gray-400 font-semibold">Public Repos</div>
                 </div>
                 
@@ -1530,7 +1892,7 @@
                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
                         <i class="fas fa-users text-white text-2xl"></i>
                     </div>
-                    <div class="text-4xl font-bold stat-number mb-2" id="github-followers" style="background: linear-gradient(135deg, #10b981, #059669); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">--</div>
+                    <div class="text-4xl font-bold stat-number mb-2" id="github-followers" style="background: linear-gradient(135deg, #10b981, #059669); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: transparent;">--</div>
                     <div class="text-gray-600 dark:text-gray-400 font-semibold">Followers</div>
                 </div>
                 
@@ -1538,7 +1900,7 @@
                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                         <i class="fas fa-user-friends text-white text-2xl"></i>
                     </div>
-                    <div class="text-4xl font-bold stat-number mb-2" id="github-following" style="background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">--</div>
+                    <div class="text-4xl font-bold stat-number mb-2" id="github-following" style="background: linear-gradient(135deg, #a855f7, #ec4899); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: transparent;">--</div>
                     <div class="text-gray-600 dark:text-gray-400 font-semibold">Following</div>
                 </div>
                 
@@ -1546,7 +1908,7 @@
                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
                         <i class="fas fa-file-code text-white text-2xl"></i>
                     </div>
-                    <div class="text-4xl font-bold stat-number mb-2" id="github-gists" style="background: linear-gradient(135deg, #f97316, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">--</div>
+                    <div class="text-4xl font-bold stat-number mb-2" id="github-gists" style="background: linear-gradient(135deg, #f97316, #ef4444); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: transparent;">--</div>
                     <div class="text-gray-600 dark:text-gray-400 font-semibold">Gists</div>
                 </div>
             </div>
@@ -1583,7 +1945,7 @@
     </section>
     
     <!-- Education Section -->
-    <section id="education" class="py-20 px-6 waves-bg reveal">
+    <section id="education" class="reveal">
         <div class="max-w-7xl mx-auto section-content">
             <h2 class="text-4xl font-bold font-poppins mb-12 text-center section-title">Education</h2>
             
@@ -1699,7 +2061,7 @@
     </section>
     
     <!-- Contact Section -->
-    <section id="contact" class="py-20 px-6 geometric-bg">
+    <section id="contact">
         <div class="max-w-7xl mx-auto section-content">
             <h2 class="text-4xl font-bold font-poppins mb-12 text-center">Get In Touch</h2>
             
@@ -1819,46 +2181,72 @@
     
     <!-- Floating Chat Button -->
     <div class="chat-button" onclick="toggleChat()">
-        <i class="fas fa-comments text-white text-2xl"></i>
+        <div class="chat-button-circle">
+            <i class="fas fa-robot text-white text-3xl"></i>
+            <div class="chat-button-status"></div>
+        </div>
+        <div class="chat-button-label">
+            <i class="fas fa-sparkles text-sm"></i>
+            <span>My Assistant</span>
+        </div>
     </div>
     
     <!-- Chat Panel -->
-    <div id="chat-panel" class="chat-panel bg-white dark:bg-dark-bg border border-gray-200 dark:border-gray-700">
-        <div class="p-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-t-2xl">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h3 class="font-bold">AI Assistant</h3>
-                    <p class="text-xs opacity-90">Powered by Gemini AI</p>
+    <div id="chat-panel" class="chat-panel bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+        <!-- Chat Header -->
+        <div class="p-4 bg-gradient-to-r from-blue-500 via-blue-600 to-purple-600 text-white rounded-t-2xl shadow-lg flex-shrink-0">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <i class="fas fa-robot text-xl"></i>
+                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-400 border-2 border-white rounded-full"></span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base">My Ghost</h3>
+                        <p class="text-xs text-blue-100">Online • Ready to help</p>
+                    </div>
                 </div>
-                <button onclick="toggleChat()" class="hover:bg-white/20 rounded p-1">
-                    <i class="fas fa-times"></i>
+                <button onclick="toggleChat()" class="hover:bg-white/20 rounded-lg p-2 transition-all duration-200 hover:rotate-90">
+                    <i class="fas fa-times text-base"></i>
                 </button>
             </div>
         </div>
         
-        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto">
-            <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
-                <p class="text-sm">👋 Click "Connect" to start chatting with the AI assistant about Sriharsha's portfolio!</p>
+        <!-- Chat Messages -->
+        <div id="chat-messages" class="flex-1 p-3 overflow-y-auto bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800" style="min-height: 0;">
+            <div class="text-center py-12 text-gray-400">
+                <i class="fas fa-comments text-5xl mb-3 opacity-50"></i>
+                <p class="text-sm font-medium">Start a conversation!</p>
+                <p class="text-xs mt-1">Ask about skills, projects, or experience</p>
             </div>
         </div>
         
-        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-            <div class="flex space-x-2">
-                <input 
-                    id="chat-input" 
-                    type="text" 
-                    placeholder="Ask about experience, skills, projects..." 
-                    disabled 
-                    class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                <button 
-                    id="chat-send-btn" 
-                    onclick="sendChatMessage()" 
-                    disabled 
-                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+        <!-- Chat Input -->
+        <div class="p-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <div class="chat-input-wrapper">
+                <div class="flex space-x-2">
+                    <textarea 
+                        id="chat-input" 
+                        rows="1"
+                        placeholder="Type your message..." 
+                        class="flex-1 px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none transition-all duration-200"
+                        disabled
+                        onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendChatMessage(); }"
+                        oninput="autoResizeTextarea(this)"
+                        style="max-height: 100px;"
+                    ></textarea>
+                    <button 
+                        id="chat-send-btn"
+                        onclick="sendChatMessage()" 
+                        class="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl flex-shrink-0"
+                        disabled
+                        title="Send message (Enter)"
+                    >
+                        <i class="fas fa-paper-plane text-sm"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-gray-400 mt-1.5 px-1">Press Enter to send, Shift+Enter for new line</p>
             </div>
-            <p class="text-xs text-gray-500 mt-2 text-center">Intelligent AI powered by Gemini</p>
         </div>
     </div>
     
@@ -1920,7 +2308,7 @@
                 
                 <h4 class="text-xl font-bold text-gray-800 dark:text-gray-200 mt-6">Technologies Used:</h4>
                 <div class="flex flex-wrap gap-2">
-                    <span class="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-full">Python</span>
+                    <span class="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-full">RG</span>
                     <span class="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-full">Plotly</span>
                     <span class="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-full">Matplotlib</span>
                     <span class="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-full">LLM</span>

@@ -53,52 +53,55 @@ window.addEventListener('scroll', () => {
 // ==================== HERO SECTION ENHANCEMENTS ====================
 
 // 1. TYPEWRITER EFFECT
-const roles = [
-    'Gen AI Engineer',
-    'RAG Specialist',
-    'LLM Orchestration Expert',
-    'AI Solutions Architect'
-];
-
-let roleIndex = 0;
-let charIndex = 0;
-let isDeleting = false;
-let typewriterDelay = 200;
-
-function typeWriter() {
-    const typewriterElement = document.getElementById('typewriter-text');
-    const currentRole = roles[roleIndex];
+function initTypewriter() {
+    const roles = ['GenAI Engineer', 'Freelancer', 'YouTuber', 'Developer'];
+    let roleIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
     
-    if (!isDeleting) {
-        typewriterElement.textContent = currentRole.substring(0, charIndex);
-        charIndex++;
-        
-        if (charIndex > currentRole.length) {
-            isDeleting = true;
-            typewriterDelay = 2000; // Pause at end
-        } else {
-            typewriterDelay = 100;
-        }
-    } else {
-        typewriterElement.textContent = currentRole.substring(0, charIndex);
-        charIndex--;
-        
-        if (charIndex === 0) {
-            isDeleting = false;
-            roleIndex = (roleIndex + 1) % roles.length;
-            typewriterDelay = 500;
-        } else {
-            typewriterDelay = 50;
-        }
+    const element = document.getElementById('typewriter-text');
+    if (!element) {
+        console.error('Typewriter element not found!');
+        return;
     }
     
-    setTimeout(typeWriter, typewriterDelay);
+    console.log('Typewriter initialized successfully');
+    
+    function type() {
+        const currentRole = roles[roleIndex];
+        
+        if (isDeleting) {
+            element.textContent = currentRole.substring(0, charIndex - 1);
+            charIndex--;
+        } else {
+            element.textContent = currentRole.substring(0, charIndex + 1);
+            charIndex++;
+        }
+        
+        let speed = isDeleting ? 50 : 100;
+        
+        if (!isDeleting && charIndex === currentRole.length) {
+            speed = 5000; // 5 seconds pause
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            roleIndex = (roleIndex + 1) % roles.length;
+            speed = 500;
+        }
+        
+        setTimeout(type, speed);
+    }
+    
+    // Start typing after a short delay
+    setTimeout(type, 500);
 }
 
-// Start typewriter effect when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(typeWriter, 1000);
-});
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTypewriter);
+} else {
+    initTypewriter();
+}
 
 // 2. PARTICLE BACKGROUND
 class ParticleSystem {
@@ -404,12 +407,13 @@ const observer = new IntersectionObserver((entries) => {
         if (entry.isIntersecting) {
             entry.target.style.opacity = '1';
             entry.target.style.transform = 'translateY(0)';
+            observer.unobserve(entry.target); // Stop observing after animation
         }
     });
 }, observerOptions);
 
-// Observe all sections for animation
-document.querySelectorAll('section > div').forEach(el => {
+// Observe all sections for animation (except hero which has its own animations)
+document.querySelectorAll('section:not(#home) > div').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(20px)';
     el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
@@ -468,8 +472,9 @@ const revealElements = document.querySelectorAll('.reveal');
 
 const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !entry.target.classList.contains('active')) {
             entry.target.classList.add('active');
+            revealObserver.unobserve(entry.target); // Stop observing after animation
         }
     });
 }, {
@@ -590,29 +595,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Add parallax effect to sections on scroll
-let ticking = false;
-window.addEventListener('scroll', () => {
-    if (!ticking) {
-        window.requestAnimationFrame(() => {
-            const scrolled = window.pageYOffset;
-            
-            // Parallax for project cards
-            document.querySelectorAll('.project-card').forEach((card, index) => {
-                const rect = card.getBoundingClientRect();
-                if (rect.top < window.innerHeight && rect.bottom > 0) {
-                    const speed = 0.05;
-                    const yPos = -(rect.top - window.innerHeight) * speed;
-                    card.style.transform = `translateY(${yPos}px)`;
-                }
-            });
-            
-            ticking = false;
-        });
-        ticking = true;
-    }
-});
-
 // ==================== END SECTION ENHANCEMENTS ====================
 
 // ==================== Chat Functionality ====================
@@ -632,6 +614,26 @@ console.log(`📡 API URL: ${CHAT_API_URL}`);
 let chatHistory = [];
 let chatWebSocket = null;
 let isConnected = false;
+let markdownParser = null;
+
+// Initialize Markdown Parser
+function initMarkdownParser() {
+    if (typeof markdownit !== 'undefined') {
+        markdownParser = window.markdownit({
+            html: false,
+            linkify: true,
+            typographer: true,
+            breaks: true
+        });
+    }
+}
+
+// Auto-resize textarea
+function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    const maxHeight = window.innerWidth <= 640 ? 80 : 100; // Smaller on mobile
+    textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + 'px';
+}
 
 // Chat Toggle
 function toggleChat() {
@@ -647,11 +649,20 @@ function toggleChat() {
 function initializeChat() {
     const chatMessages = document.getElementById('chat-messages');
     
-    // Add loading message
+    // Initialize markdown parser
+    initMarkdownParser();
+    
+    // Add loading message with enhanced styling
     chatMessages.innerHTML = `
-        <div class="text-center py-4">
-            <i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i>
-            <p class="text-sm text-gray-500 mt-2">Connecting to AI assistant...</p>
+        <div class="chat-message text-center py-8">
+            <div class="inline-flex items-center space-x-3 bg-blue-50 dark:bg-blue-900/20 px-6 py-4 rounded-2xl">
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                <p class="text-sm text-gray-600 dark:text-gray-300 font-medium">Connecting to AI assistant...</p>
+            </div>
         </div>
     `;
     
@@ -700,17 +711,40 @@ function connectWebSocket() {
 // HTTP Chat Fallback
 function initializeHTTPChat() {
     isConnected = true;
-    displayWelcomeMessage("Hi! I'm Sriharsha's AI assistant. Ask me anything about his professional experience, skills, projects, or education!");
+    displayWelcomeMessage("Hi! I'm Sriharsha's AI assistant. 👋\n\nI can help you learn about:\n• Professional experience & skills\n• Projects & achievements\n• Education & certifications\n• Technical expertise\n\nFeel free to ask me anything!");
+}
+
+// Parse and render message content
+function parseMessageContent(message) {
+    if (markdownParser) {
+        // Render markdown
+        let html = markdownParser.render(message);
+        
+        // Make links open in new tab
+        html = html.replace(/<a href=/g, '<a target="_blank" rel="noopener noreferrer" href=');
+        
+        return html;
+    } else {
+        // Fallback: simple text with link detection
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        return escapeHtml(message).replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>');
+    }
 }
 
 // Display Welcome Message
 function displayWelcomeMessage(message) {
     const chatMessages = document.getElementById('chat-messages');
     chatMessages.innerHTML = `
-        <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4">
-            <div class="flex items-start space-x-2">
-                <i class="fas fa-robot text-blue-500 mt-1"></i>
-                <p class="text-sm">${message}</p>
+        <div class="chat-message">
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl p-4 mb-3 shadow-sm border border-blue-100 dark:border-blue-800">
+                <div class="flex items-start space-x-2">
+                    <div class="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1 chat-message-content text-sm text-gray-700 dark:text-gray-300">
+                        ${parseMessageContent(message)}
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -718,17 +752,24 @@ function displayWelcomeMessage(message) {
     // Enable input
     document.getElementById('chat-input').disabled = false;
     document.getElementById('chat-send-btn').disabled = false;
+    document.getElementById('chat-input').focus();
 }
 
 // Display User Message
 function displayUserMessage(message) {
     const chatMessages = document.getElementById('chat-messages');
     const messageDiv = document.createElement('div');
-    messageDiv.className = 'bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-4 ml-8';
+    messageDiv.className = 'chat-message';
     messageDiv.innerHTML = `
-        <div class="flex items-start space-x-2 justify-end">
-            <p class="text-sm text-right">${escapeHtml(message)}</p>
-            <i class="fas fa-user text-blue-500 mt-1"></i>
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl rounded-tr-sm p-3 mb-3 ml-8 sm:ml-12 shadow-md">
+            <div class="flex items-start space-x-2 justify-end">
+                <div class="flex-1 chat-message-content text-sm text-right">
+                    ${parseMessageContent(message)}
+                </div>
+                <div class="flex-shrink-0 w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-xs"></i>
+                </div>
+            </div>
         </div>
     `;
     chatMessages.appendChild(messageDiv);
@@ -739,11 +780,17 @@ function displayUserMessage(message) {
 function displayAssistantMessage(message) {
     const chatMessages = document.getElementById('chat-messages');
     const messageDiv = document.createElement('div');
-    messageDiv.className = 'bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4 mr-8';
+    messageDiv.className = 'chat-message';
     messageDiv.innerHTML = `
-        <div class="flex items-start space-x-2">
-            <i class="fas fa-robot text-blue-500 mt-1"></i>
-            <p class="text-sm">${escapeHtml(message)}</p>
+        <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm p-3 mb-3 mr-8 sm:mr-12 shadow-md border border-gray-200 dark:border-gray-700">
+            <div class="flex items-start space-x-2">
+                <div class="flex-shrink-0 w-7 h-7 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
+                    <i class="fas fa-robot text-white text-xs"></i>
+                </div>
+                <div class="flex-1 chat-message-content text-sm text-gray-800 dark:text-gray-200">
+                    ${parseMessageContent(message)}
+                </div>
+            </div>
         </div>
     `;
     chatMessages.appendChild(messageDiv);
@@ -755,11 +802,22 @@ function displayLoadingMessage() {
     const chatMessages = document.getElementById('chat-messages');
     const messageDiv = document.createElement('div');
     messageDiv.id = 'loading-message';
-    messageDiv.className = 'bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4';
+    messageDiv.className = 'chat-message';
     messageDiv.innerHTML = `
-        <div class="flex items-center space-x-2">
-            <i class="fas fa-spinner fa-spin text-blue-500"></i>
-            <p class="text-sm text-gray-500">Thinking...</p>
+        <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm p-3 mb-3 mr-8 sm:mr-12 shadow-md border border-gray-200 dark:border-gray-700">
+            <div class="flex items-start space-x-2">
+                <div class="flex-shrink-0 w-7 h-7 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
+                    <i class="fas fa-robot text-white text-xs"></i>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Thinking...</p>
+                </div>
+            </div>
         </div>
     `;
     chatMessages.appendChild(messageDiv);
@@ -778,11 +836,18 @@ function removeLoadingMessage() {
 function displayErrorMessage(message) {
     const chatMessages = document.getElementById('chat-messages');
     const messageDiv = document.createElement('div');
-    messageDiv.className = 'bg-red-50 dark:bg-red-900/20 rounded-lg p-4 mb-4';
+    messageDiv.className = 'chat-message';
     messageDiv.innerHTML = `
-        <div class="flex items-start space-x-2">
-            <i class="fas fa-exclamation-circle text-red-500 mt-1"></i>
-            <p class="text-sm text-red-600 dark:text-red-400">${escapeHtml(message)}</p>
+        <div class="bg-red-50 dark:bg-red-900/20 rounded-2xl rounded-tl-sm p-4 mb-4 shadow-md border border-red-200 dark:border-red-800">
+            <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center shadow-md">
+                    <i class="fas fa-exclamation-circle text-white text-sm"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-red-700 dark:text-red-300 mb-1">Error</p>
+                    <p class="text-sm text-red-600 dark:text-red-400">${escapeHtml(message)}</p>
+                </div>
+            </div>
         </div>
     `;
     chatMessages.appendChild(messageDiv);
@@ -799,6 +864,9 @@ async function sendChatMessage() {
     // Display user message
     displayUserMessage(message);
     input.value = '';
+    
+    // Reset textarea height
+    input.style.height = 'auto';
     
     // Disable input while processing
     input.disabled = true;
@@ -833,6 +901,11 @@ async function sendChatMessage() {
             removeLoadingMessage();
             displayAssistantMessage(data.response);
             
+            // Handle navigation actions
+            if (data.actions && data.actions.length > 0) {
+                handleChatActions(data.actions);
+            }
+            
             // Update history
             chatHistory.push({
                 user: message,
@@ -851,10 +924,99 @@ async function sendChatMessage() {
     }
 }
 
-// Scroll chat to bottom
+// Handle actions from chat response
+function handleChatActions(actions) {
+    actions.forEach(action => {
+        if (action.type === 'navigate' && action.section_id) {
+            // Delay navigation slightly so user can see the message
+            setTimeout(() => {
+                navigateToSection(action.section_id, action.audio_text);
+            }, 300);
+        }
+    });
+}
+
+// Navigate to a specific section with optional audio announcement
+function navigateToSection(sectionId, audioText = null) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        const offsetTop = section.offsetTop - 80; // 80px offset for navbar
+        window.scrollTo({
+            top: offsetTop,
+            behavior: 'smooth'
+        });
+        
+        // Optional: Add brief highlight effect
+        section.classList.add('section-highlight');
+        setTimeout(() => {
+            section.classList.remove('section-highlight');
+        }, 2000);
+        
+        // Update URL hash
+        history.pushState(null, null, `#${sectionId}`);
+        
+        // Play audio announcement if provided
+        if (audioText) {
+            playAudioAnnouncement(audioText);
+        }
+    }
+}
+
+// Play audio announcement using Web Speech API
+function playAudioAnnouncement(text) {
+    // Check if browser supports Speech Synthesis
+    if ('speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+        
+        // Create speech utterance
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Configure voice settings
+        utterance.rate = 1.0;  // Normal speed
+        utterance.pitch = 1.0; // Normal pitch
+        utterance.volume = 0.9; // High volume
+        
+        // Function to set voice
+        const setVoice = () => {
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                // Prefer English female voices for better clarity
+                const preferredVoice = voices.find(voice => 
+                    voice.lang.startsWith('en') && (
+                        voice.name.includes('Female') || 
+                        voice.name.includes('Google') ||
+                        voice.name.includes('Samantha')
+                    )
+                ) || voices.find(voice => voice.lang.startsWith('en'));
+                
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                }
+                
+                // Speak the text
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+        
+        // Voices might not be loaded immediately, so wait for them
+        if (window.speechSynthesis.getVoices().length > 0) {
+            setVoice();
+        } else {
+            window.speechSynthesis.onvoiceschanged = setVoice;
+        }
+    } else {
+        console.log('Speech synthesis not supported');
+    }
+}
+
+// Scroll chat to bottom with smooth animation
 function scrollChatToBottom() {
     const chatMessages = document.getElementById('chat-messages');
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatMessages.scrollTo({
+        top: chatMessages.scrollHeight,
+        behavior: 'smooth'
+    });
 }
 
 // Escape HTML to prevent XSS
@@ -916,30 +1078,12 @@ skillBadges.forEach((badge, index) => {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = '1';
                 entry.target.style.transform = 'translateY(0)';
+                badgeObserver.unobserve(entry.target); // Stop observing after animation
             }
         });
     });
     
     badgeObserver.observe(badge);
-});
-
-// Project Card Animations
-const projectCards = document.querySelectorAll('.project-card');
-projectCards.forEach((card, index) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(30px)';
-    card.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
-    
-    const cardObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    });
-    
-    cardObserver.observe(card);
 });
 
 // Navbar Background on Scroll
@@ -1010,15 +1154,6 @@ function debounce(func, wait = 10, immediate = true) {
 window.addEventListener('scroll', debounce(() => {
     // Your scroll functions here
 }));
-
-// Loading Animation
-window.addEventListener('load', () => {
-    document.body.style.opacity = '0';
-    document.body.style.transition = 'opacity 0.3s ease';
-    setTimeout(() => {
-        document.body.style.opacity = '1';
-    }, 100);
-});
 
 // Console Message for Developers
 console.log('%cHey there! 👋', 'color: #3b82f6; font-size: 24px; font-weight: bold;');

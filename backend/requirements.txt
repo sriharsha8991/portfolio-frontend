@@ -6,6 +6,9 @@ uvicorn[standard]
 # Replaces google-generativeai with improved developer experience
 google-genai
 
+# HTTP Client for GitHub API
+aiohttp
+
 # Core dependencies
 python-multipart
 pydantic
