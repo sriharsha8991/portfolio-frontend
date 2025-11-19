@@ -22,7 +22,7 @@ class AnswerService:
     """Service for answering user questions about Sriharsha's portfolio"""
     
     def __init__(self):
-        self.model_name = 'gemini-2.5-flash'
+        self.model_name = 'gemini-2.0-flash'
         self.client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
         
         # Load system prompt
