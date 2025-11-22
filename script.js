@@ -109,7 +109,7 @@ class ParticleSystem {
         this.canvas = document.getElementById('particle-canvas');
         this.ctx = this.canvas.getContext('2d');
         this.particles = [];
-        this.particleCount = 80;
+        this.particleCount = 50; // Reduced for cleaner look
         this.mouse = { x: 0, y: 0 };
         
         this.init();
@@ -160,7 +160,7 @@ class ParticleSystem {
             
             // Draw particle
             const isDark = html.classList.contains('dark');
-            this.ctx.fillStyle = isDark ? 'rgba(59, 130, 246, 0.5)' : 'rgba(59, 130, 246, 0.3)';
+            this.ctx.fillStyle = isDark ? 'rgba(79, 70, 229, 0.5)' : 'rgba(79, 70, 229, 0.3)';
             this.ctx.beginPath();
             this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
             this.ctx.fill();
@@ -174,8 +174,8 @@ class ParticleSystem {
                 if (distance < 120) {
                     const opacity = (1 - distance / 120) * 0.3;
                     this.ctx.strokeStyle = isDark 
-                        ? `rgba(139, 92, 246, ${opacity})` 
-                        : `rgba(59, 130, 246, ${opacity})`;
+                        ? `rgba(124, 58, 237, ${opacity})` 
+                        : `rgba(79, 70, 229, ${opacity})`;
                     this.ctx.lineWidth = 1;
                     this.ctx.beginPath();
                     this.ctx.moveTo(particle.x, particle.y);
@@ -467,7 +467,7 @@ document.addEventListener('keydown', (e) => {
 
 // ==================== SECTION ENHANCEMENTS ====================
 
-// Scroll Reveal Animation
+// Scroll Reveal Animation - Improved to prevent blocking
 const revealElements = document.querySelectorAll('.reveal');
 
 const revealObserver = new IntersectionObserver((entries) => {
@@ -478,8 +478,8 @@ const revealObserver = new IntersectionObserver((entries) => {
         }
     });
 }, {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    threshold: 0.05, // Trigger earlier
+    rootMargin: '0px 0px -100px 0px' // Start animation before element is fully in view
 });
 
 revealElements.forEach(element => {
