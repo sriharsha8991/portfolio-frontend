@@ -20,7 +20,8 @@ export function TiltCard({ children, className = "", options = {} }: TiltCardPro
   const tiltRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!tiltRef.current) return;
+    const node = tiltRef.current;
+    if (!node) return;
 
     const defaultOptions = {
       max: 8,
@@ -32,11 +33,11 @@ export function TiltCard({ children, className = "", options = {} }: TiltCardPro
       ...options,
     };
 
-    VanillaTilt.init(tiltRef.current, defaultOptions);
+    VanillaTilt.init(node, defaultOptions);
 
     return () => {
-      if (tiltRef.current?.vanillaTilt) {
-        tiltRef.current.vanillaTilt.destroy();
+      if (node?.vanillaTilt) {
+        node.vanillaTilt.destroy();
       }
     };
   }, [options]);

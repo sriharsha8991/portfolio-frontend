@@ -41,7 +41,7 @@ body {
 }
 
 .animate-marquee {
-  animation: marquee 20s linear infinite;
+  animation: marquee 45s linear infinite;
   width: max-content;
 }
 
@@ -242,5 +242,55 @@ body {
   opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   animation: grain 8s steps(10) infinite;
+}
+
+/* Unified Ambient Background Animations */
+@keyframes mesh-drift {
+  0%, 100% {
+    background-position: 0% 0%, 100% 100%, 0 0, 0 0;
+  }
+  50% {
+    background-position: 100% 100%, 0% 0%, 40px 40px, 40px 40px;
+  }
+}
+
+.animate-mesh-drift {
+  animation: mesh-drift 60s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 8s ease-in-out infinite;
+}
+
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-200px) translateX(100px);
+    opacity: 0;
+  }
+}
+
+.animate-float-particle {
+  animation: float-particle 16s ease-in-out infinite;
 }
 

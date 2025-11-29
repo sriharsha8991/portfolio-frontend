@@ -2,6 +2,8 @@
 
 import { ScrambleText } from "@/components/ui/scramble-text";
 import { TiltCard } from "@/components/ui/tilt-card";
+import { GitHubCard } from "@/components/ui/github-card";
+import { ParticleField } from "@/components/ui/particle-field";
 import { ArrowRight, Copy, Terminal } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -81,7 +83,7 @@ export default function Home() {
           transition={{ duration: 0.8, delay: 0.6 }}
         >
              <h1 
-               className="glitch-text text-[14vh] font-black text-white opacity-[0.1] hover:opacity-100 transition-all duration-500 leading-none tracking-tighter -rotate-90 whitespace-nowrap cursor-default hover:text-white hover:drop-shadow-[0_0_25px_rgba(255,255,255,0.8)] hover:[text-shadow:0_0_40px_#fff,0_0_80px_#fff,0_0_120px_#6366f1]"
+               className="glitch-text text-[14vh] font-black text-white opacity-[0.1] hover:opacity-100 transition-all duration-10 leading-none tracking-tighter -rotate-90 whitespace-nowrap cursor-default hover:text-white hover:drop-shadow-[0_0_25px_rgba(255,255,255,0.9)] hover:[text-shadow:0_0_40px_#fff,0_0_80px_#fff,0_0_120px_#6366f1]"
                data-text="SRIHARSHA"
              >
                 SRIHARSHA
@@ -170,39 +172,6 @@ export default function Home() {
              </motion.div>
         </motion.div>
 
-        {/* Infinite Marquee */}
-        <motion.div 
-          className="absolute bottom-0 w-full bg-gradient-to-r from-black via-black/80 to-black border-t border-white/10 py-4 overflow-hidden z-30 group/marquee"
-          initial={{ y: 100, opacity: 0 }}
-          animate={isLoaded ? { y: 0, opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 1.4 }}
-        >
-            <div className="animate-marquee flex items-center gap-6 group-hover/marquee:[animation-play-state:paused]">
-                {[1, 2, 3, 4].map((idx) => (
-                  <div key={idx} className="flex items-center gap-6 shrink-0">
-                    <span className="px-4 py-1.5 bg-indigo-500/20 border border-indigo-500/30 rounded-full text-indigo-400 text-sm font-mono whitespace-nowrap cursor-pointer hover:bg-indigo-500/40 hover:scale-105 transition-all">RAG</span>
-                    <span className="text-white/20">•</span>
-                    <span className="px-4 py-1.5 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-400 text-sm font-mono whitespace-nowrap cursor-pointer hover:bg-cyan-500/40 hover:scale-105 transition-all">AGENTS</span>
-                    <span className="text-white/20">•</span>
-                    <span className="px-4 py-1.5 bg-purple-500/20 border border-purple-500/30 rounded-full text-purple-400 text-sm font-mono whitespace-nowrap cursor-pointer hover:bg-purple-500/40 hover:scale-105 transition-all">LLMs</span>
-                    <span className="text-white/20">•</span>
-                    <span className="text-white/40 font-mono text-sm whitespace-nowrap cursor-pointer hover:text-white/70 transition-all">PYTHON</span>
-                    <span className="text-white/20">•</span>
-                    <span className="text-white/40 font-mono text-sm whitespace-nowrap cursor-pointer hover:text-white/70 transition-all">NEXT.JS</span>
-                    <span className="text-white/20">•</span>
-                    <span className="text-white/40 font-mono text-sm whitespace-nowrap cursor-pointer hover:text-white/70 transition-all">TYPESCRIPT</span>
-                    <span className="text-white/20">•</span>
-                    <span className="text-white/40 font-mono text-sm whitespace-nowrap cursor-pointer hover:text-white/70 transition-all">LANGCHAIN</span>
-                    <span className="text-white/20">•</span>
-                    <span className="text-white/40 font-mono text-sm whitespace-nowrap cursor-pointer hover:text-white/70 transition-all">VECTOR DB</span>
-                    <span className="text-white/20">•</span>
-                    <span className="text-white/40 font-mono text-sm whitespace-nowrap cursor-pointer hover:text-white/70 transition-all">FASTAPI</span>
-                    <span className="text-white/20">•</span>
-                  </div>
-                ))}
-            </div>
-        </motion.div>
-
         {/* Scroll Indicator */}
         <motion.div 
           className="absolute bottom-20 left-1/2 -translate-x-1/2 z-40 hidden lg:flex flex-col items-center gap-2"
@@ -214,20 +183,42 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Section Transition */}
-      <div className="relative w-full py-28 bg-gradient-to-b from-[#050505] via-[#080808] to-[#050505] overflow-hidden">
-        {/* Animated grid background */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ 
-          backgroundImage: `linear-gradient(rgba(99,102,241,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.3) 1px, transparent 1px)`,
-          backgroundSize: '50px 50px'
-        }} />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.08),transparent_60%)]" />
+      {/* Section Transition + Bento Wrapper with Unified Background */}
+      <div className="relative w-full bg-[#050505]">
+        {/* Particle Field - Canvas-based flowing particles */}
+        <ParticleField />
         
-        {/* Floating particles */}
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-indigo-500/30 rounded-full animate-pulse" />
-        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-cyan-500/40 rounded-full animate-ping" style={{ animationDuration: '2s' }} />
-        <div className="absolute bottom-1/4 right-1/4 w-1.5 h-1.5 bg-purple-500/30 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+        {/* Unified Ambient Background Layer - Extends through both sections */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Soft mesh grid - matches hero subtlety */}
+          <div className="absolute inset-0 opacity-[0.015] animate-mesh-drift" style={{ 
+            backgroundImage: `
+              radial-gradient(circle at 25% 25%, rgba(99,102,241,0.4) 0%, transparent 50%),
+              radial-gradient(circle at 75% 75%, rgba(6,182,212,0.3) 0%, transparent 50%),
+              linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), 
+              linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)
+            `,
+            backgroundSize: '100% 100%, 100% 100%, 80px 80px, 80px 80px'
+          }} />
+          
+          {/* Volumetric glow orbs - subtle breathing effect */}
+          <div className="absolute top-[10%] left-[20%] w-[500px] h-[500px] bg-indigo-500/[0.03] blur-[150px] rounded-full animate-pulse-glow" />
+          <div className="absolute top-[40%] right-[15%] w-[400px] h-[400px] bg-cyan-500/[0.02] blur-[120px] rounded-full animate-pulse-glow" style={{ animationDelay: '2s' }} />
+          <div className="absolute bottom-[20%] left-[30%] w-[450px] h-[450px] bg-purple-500/[0.025] blur-[130px] rounded-full animate-pulse-glow" style={{ animationDelay: '4s' }} />
+          
+          {/* Subtle noise texture overlay */}
+          <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+          
+          {/* Floating particles - drift slowly */}
+          <div className="absolute top-[15%] left-[10%] w-1 h-1 bg-indigo-400/40 rounded-full animate-float-particle" />
+          <div className="absolute top-[35%] right-[20%] w-0.5 h-0.5 bg-white/30 rounded-full animate-float-particle" style={{ animationDelay: '1s', animationDuration: '15s' }} />
+          <div className="absolute top-[55%] left-[40%] w-1.5 h-1.5 bg-cyan-400/30 rounded-full animate-float-particle" style={{ animationDelay: '3s', animationDuration: '18s' }} />
+          <div className="absolute top-[70%] right-[35%] w-1 h-1 bg-purple-400/35 rounded-full animate-float-particle" style={{ animationDelay: '2s', animationDuration: '20s' }} />
+          <div className="absolute bottom-[25%] left-[25%] w-0.5 h-0.5 bg-white/25 rounded-full animate-float-particle" style={{ animationDelay: '4s', animationDuration: '22s' }} />
+        </div>
         
+        {/* At a Glance Section */}
+        <div className="relative py-28 overflow-hidden">
         <div className="max-w-5xl mx-auto px-6 relative z-10">
           <motion.div 
             className="flex items-center gap-8"
@@ -244,13 +235,34 @@ export default function Home() {
             </div>
             <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
           </motion.div>
+          
+          {/* Skills Pills */}
+          <motion.div 
+            className="flex flex-col items-center gap-3 mt-10"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+              {/* First Row - 4 pills */}
+              <div className="flex items-center justify-center gap-4 flex-wrap">
+                  <span className="px-6 py-2 bg-indigo-500/20 border border-indigo-500/30 rounded-full text-indigo-400 text-base font-mono whitespace-nowrap cursor-pointer hover:bg-indigo-500/40 hover:scale-105 transition-all">RAG SYSTEMS</span>
+                  <span className="px-6 py-2 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-400 text-base font-mono whitespace-nowrap cursor-pointer hover:bg-cyan-500/40 hover:scale-105 transition-all">AGENTIC AI</span>
+                  <span className="px-6 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full text-purple-400 text-base font-mono whitespace-nowrap cursor-pointer hover:bg-purple-500/40 hover:scale-105 transition-all">LLM ORCHESTRATION</span>
+                  <span className="px-6 py-2 bg-black/50 border border-white/15 rounded-full text-white/60 text-base font-mono whitespace-nowrap cursor-pointer hover:bg-white/10 hover:text-white/80 hover:scale-105 transition-all">PYTHON</span>
+              </div>
+              {/* Second Row - 3 pills */}
+              <div className="flex items-center justify-center gap-4 flex-wrap">
+                  <span className="px-6 py-2 bg-black/50 border border-white/15 rounded-full text-white/60 text-base font-mono whitespace-nowrap cursor-pointer hover:bg-white/10 hover:text-white/80 hover:scale-105 transition-all">LANGCHAIN</span>
+                  <span className="px-6 py-2 bg-black/50 border border-white/15 rounded-full text-white/60 text-base font-mono whitespace-nowrap cursor-pointer hover:bg-white/10 hover:text-white/80 hover:scale-105 transition-all">VECTOR DB</span>
+                  <span className="px-6 py-2 bg-black/50 border border-white/15 rounded-full text-white/60 text-base font-mono whitespace-nowrap cursor-pointer hover:bg-white/10 hover:text-white/80 hover:scale-105 transition-all">FASTAPI</span>
+              </div>
+          </motion.div>
         </div>
-      </div>
+        </div>
 
       {/* Bento Grid */}
       <section className="w-full max-w-6xl px-8 pb-32 mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
-        {/* Ambient glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-indigo-500/5 blur-[100px] rounded-full pointer-events-none" />
         
         {/* Status Card */}
         <TiltCard className="col-span-1 md:col-span-2">
@@ -271,13 +283,20 @@ export default function Home() {
               <span className="text-sm text-green-400 font-mono">Building TenderGenie</span>
             </div>
           </div>
-          <div className="h-44 flex items-end">
-             <div className="w-full bg-black/50 rounded-xl p-6 font-mono text-sm text-gray-400 border border-white/5 leading-relaxed">
-                <div className="text-indigo-400 text-base">&gt; system.init()</div>
-                <div className="mt-1">&gt; Optimizing RAG pipeline...</div>
-                <div className="mt-1">&gt; Indexing <span className="text-cyan-400 font-semibold">10,247</span> documents...</div>
-                <div className="mt-1">&gt; Accuracy: <span className="text-green-400 font-semibold">89.77%</span></div>
-                <span className="animate-pulse text-indigo-400 text-base">&gt; _</span>
+          <div className="h-44 flex flex-col justify-between">
+             {/* Skills Summary */}
+             <div className="text-gray-300 leading-relaxed">
+                <p className="text-lg">Gen-AI Engineer specializing in <span className="text-indigo-400 font-semibold">RAG Systems</span>, <span className="text-cyan-400 font-semibold">Agentic Workflows</span>,</p>
+                <p className="text-lg">and <span className="text-purple-400 font-semibold">LLM Orchestration</span> with Python & LangChain.</p>
+             </div>
+             {/* Terminal */}
+             <div className="w-full bg-black/50 rounded-xl p-4 font-mono text-sm text-gray-400 border border-white/5">
+                <div className="flex items-center gap-2">
+                  <span className="text-indigo-400">&gt;</span>
+                  <span>Optimizing RAG pipeline...</span>
+                  <span className="text-green-400 font-semibold">89.77% accuracy</span>
+                  <span className="animate-pulse text-indigo-400">_</span>
+                </div>
              </div>
           </div>
           </motion.div>
@@ -304,77 +323,14 @@ export default function Home() {
               </div>
            </div>
            <div className="text-right relative z-10">
-              <p className="text-2xl font-bold">Bengaluru</p>
-              <p className="text-sm text-gray-500 font-mono mt-1">12.9716° N, 77.5946° E</p>
+              <p className="text-2xl font-bold">Pune</p>
+              <p className="text-sm text-gray-500 font-mono mt-1">18.5204° N, 73.8567° E</p>
            </div>
           </motion.div>
         </TiltCard>
 
-        {/* Github Card - Enhanced */}
-        <TiltCard className="col-span-1">
-          <motion.div 
-            className="h-full p-10 rounded-4xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent backdrop-blur-md hover:border-green-500/30 transition-all duration-500 group hover:shadow-[0_0_40px_rgba(34,197,94,0.12)] relative overflow-hidden"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            viewport={{ once: true }}
-          >
-           {/* GitHub Icon Background */}
-           <div className="absolute -right-6 -bottom-6 opacity-5 group-hover:opacity-10 transition-opacity">
-             <svg className="w-32 h-32" viewBox="0 0 24 24" fill="currentColor">
-               <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-             </svg>
-           </div>
-           
-           <div className="flex items-center justify-between mb-6">
-             <h3 className="text-base font-mono text-gray-400 group-hover:text-green-400 transition-colors tracking-wider">CONTRIBUTIONS</h3>
-             <a href="https://github.com/sriharsha8991" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 hover:text-green-400 transition-colors font-mono">@sriharsha8991</a>
-           </div>
-           
-           {/* Contribution Graph - More Dynamic */}
-           <div className="grid grid-cols-12 gap-1 mb-4">
-              {[0,1,0,2,1,0,1,2,0,1,3,2, 1,2,1,0,2,3,2,1,0,2,1,3, 0,1,2,3,2,1,0,1,2,3,2,1, 2,3,2,1,2,3,2,3,2,1,3,2, 1,2,3,2,1,2,1,2,3,2,1,2, 0,1,2,1,0,1,0,1,2,1,0,1].map((level, i) => (
-                 <div 
-                    key={i} 
-                    className={`aspect-square rounded-sm transition-all duration-300 ${
-                      level === 0 ? 'bg-white/5' :
-                      level === 1 ? 'bg-green-500/30' :
-                      level === 2 ? 'bg-green-500/50' :
-                      'bg-green-500/80 shadow-[0_0_4px_rgba(34,197,94,0.5)]'
-                    } group-hover:scale-110`}
-                    style={{ transitionDelay: `${i * 8}ms` }}
-                 />
-              ))}
-           </div>
-           
-           {/* Stats Row */}
-           <div className="grid grid-cols-3 gap-3 mb-4">
-              <div className="bg-white/5 rounded-lg p-3 text-center border border-white/5 hover:border-green-500/20 transition-colors">
-                <div className="text-green-400 font-mono font-bold text-xl">127</div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Last Month</div>
-              </div>
-              <div className="bg-white/5 rounded-lg p-3 text-center border border-white/5 hover:border-green-500/20 transition-colors">
-                <div className="text-green-400 font-mono font-bold text-xl">847</div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Last Year</div>
-              </div>
-              <div className="bg-white/5 rounded-lg p-3 text-center border border-white/5 hover:border-green-500/20 transition-colors">
-                <div className="text-green-400 font-mono font-bold text-xl">12</div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Repos</div>
-              </div>
-           </div>
-           
-           <div className="flex items-center justify-between text-sm">
-             <div className="flex items-center gap-1.5">
-               <span className="text-gray-600">Less</span>
-               {[0,1,2,3].map(l => (
-                 <div key={l} className={`w-3.5 h-3.5 rounded-sm ${l === 0 ? 'bg-white/5' : l === 1 ? 'bg-green-500/30' : l === 2 ? 'bg-green-500/50' : 'bg-green-500/80'}`} />
-               ))}
-               <span className="text-gray-600">More</span>
-             </div>
-             <span className="text-gray-500 font-mono text-xs">2024-2025</span>
-           </div>
-          </motion.div>
-        </TiltCard>
+        {/* Github Card - Real-time Stats */}
+        <GitHubCard />
 
         {/* Stack / Core Competencies - Enhanced */}
         <TiltCard className="col-span-1 md:col-span-2">
@@ -452,6 +408,7 @@ export default function Home() {
           </motion.div>
         </TiltCard>
       </section>
+      </div>
     </main>
   );
 }
