@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const DOCK_ITEMS = [
   { name: "Home", href: "/", icon: Home },
-  { name: "Intelligence", href: "/about", icon: Brain },
+  { name: "Profile", href: "/about", icon: Brain },
   { name: "Cortex", href: "/projects", icon: Cpu },
   { name: "Personal", href: "/life", icon: User },
   { name: "Services", href: "/freelance", icon: Briefcase },

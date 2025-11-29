@@ -5,6 +5,8 @@ import { LenisProvider } from "@/components/providers/lenis-provider";
 import { Dock } from "@/components/ui/dock";
 import { Orb } from "@/components/ui/orb";
 import { SpotlightEffect } from "@/components/ui/spotlight";
+import { CustomCursor } from "@/components/ui/custom-cursor";
+import { FloatingElements } from "@/components/ui/floating-elements";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,8 +31,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground cursor-none`}
       >
+        <CustomCursor />
+        <FloatingElements />
         <div className="noise-overlay" />
         <SpotlightEffect />
         <LenisProvider>
